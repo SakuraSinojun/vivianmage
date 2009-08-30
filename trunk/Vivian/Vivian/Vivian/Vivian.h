@@ -13,7 +13,7 @@
 #pragma once
 
 #include "windows.h"
-#include "Geometry.h"
+#include "typedef.h"
 
 
 BOOL	run();
@@ -23,6 +23,9 @@ BOOL	OnIdle(long count);
 BOOL	PreTranslateMessage(MSG * msg);
 BOOL	OnEraseBkGnd();
 
+void OnCreate(HWND hWnd);
+BOOL OnDestroy();
+BOOL OnClose();
 void OnPaint();
 void OnLButtonDown(WPARAM wParam,CPoint point);
 void OnRButtonDown(WPARAM wParam,CPoint point);

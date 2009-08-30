@@ -188,6 +188,22 @@
 				RelativePath=".\FadeDocument.txt"
 				>
 			</File>
+			<File
+				RelativePath=".\libFade\Layer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\Layer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\MainWnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\MainWnd.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="资源文件"
@@ -200,6 +216,10 @@
 			>
 			<File
 				RelativePath=".\Geometry.h"
+				>
+			</File>
+			<File
+				RelativePath=".\typedef.h"
 				>
 			</File>
 		</Filter>

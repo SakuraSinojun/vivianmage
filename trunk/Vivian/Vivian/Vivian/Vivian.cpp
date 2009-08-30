@@ -14,6 +14,8 @@
 
 #include "Vivian.h"
 
+#include "libFade\MainWnd.h"
+
 
 #define _ONIDLE_
 #undef	_ONIDLE_
@@ -23,6 +25,7 @@
 HWND m_hWnd;
 HINSTANCE m_hInstance;
 
+CMainWnd * pMainWnd;
 
 
 
@@ -32,8 +35,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,
                      int       nCmdShow)
 {
 	m_hInstance=hInstance;
+	pMainWnd=NULL;
 
-	return run();
+	int res= run();
+
+
+	delete pMainWnd;
+	return res;
+
 }
 
 
@@ -54,9 +63,14 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 	PAINTSTRUCT ps;
 	switch(uMsg)
 	{
-		case WM_DESTROY:
-			PostQuitMessage(0);
+		case WM_CREATE:
+			OnCreate(hwnd);
 			break;
+		case WM_DESTROY:
+			return OnDestroy();
+			break;
+		case WM_CLOSE:
+			return OnClose();
 		case WM_PAINT:
 			::BeginPaint(hwnd, &ps);
 			OnPaint();
@@ -134,7 +148,7 @@ BOOL VVCreateWindow()
 	
 	
 	CRect rect;
-	rect=CRect(0,0,639,479);
+	rect=CRect(0,0,GAME_WINDOW_WIDTH-4,GAME_WINDOW_HEIGHT-4);
 	::AdjustWindowRect(&rect,WS_OVERLAPPEDWINDOW,FALSE);
 
 
@@ -200,14 +214,37 @@ BOOL PreTranslateMessage(MSG * msg)
 	return FALSE;
 }
 
-void OnLButtonDown(WPARAM wParam,CPoint point)
+void OnCreate(HWND hWnd)
 {
+	pMainWnd=new CMainWnd(hWnd);
 
 }
+
+BOOL OnDestroy()
+{
+	PostQuitMessage(0);
+	return TRUE;
+}
+
+BOOL OnClose()
+{
+	//if(6==::MessageBox(m_hWnd,TEXT("确定要退出？"),TEXT("结束游戏"),MB_YESNO))
+	{
+		PostQuitMessage(0);
+	}
+	return TRUE;
+}
+
+void OnLButtonDown(WPARAM wParam,CPoint point)
+{
+	pMainWnd->OnLButtonDown (wParam,point);
+}
+
 void OnRButtonDown(WPARAM wParam,CPoint point)
 {
 
 }
+
 void OnMouseMove(WPARAM wParam,CPoint point)
 {
 
@@ -216,19 +253,7 @@ void OnMouseMove(WPARAM wParam,CPoint point)
 
 void OnPaint()
 {
-	HDC	hdc=::GetDC(m_hWnd);
-	
-	HDC memDC;
-
-	HBITMAP hBitmap=(HBITMAP)::LoadImage(m_hInstance,TEXT("bg.bmp"),IMAGE_BITMAP,0,0,LR_LOADFROMFILE|LR_CREATEDIBSECTION);
-
-	memDC=::CreateCompatibleDC(hdc);
-	::SelectObject (memDC,hBitmap);
-
-	::BitBlt (hdc,0,0,640,480,memDC,0,0,SRCCOPY);
-
-	::DeleteDC (memDC);
-
+	pMainWnd->OnPaint ();
 }
 
 BOOL OnEraseBkGnd()
