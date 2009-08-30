@@ -22,8 +22,8 @@ typedef struct tagBKGNDPARAMETER
 
 
 
-#define GAME_WINDOW_WIDTH	800
-#define GAME_WINDOW_HEIGHT	600
+#define GAME_WINDOW_WIDTH	640
+#define GAME_WINDOW_HEIGHT	480
 
 
 

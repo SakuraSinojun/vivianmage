@@ -29,6 +29,7 @@ extern CMainWnd * pMainWnd;
 
 wchar_t	*	charfile[3]={TEXT("CGDATA\\CHAR.bmp"),TEXT("CGDATA\\CHAR1.bmp"),TEXT("CGDATA\\CHAR2.bmp")};
 int			charconst=0;
+wchar_t *	bgfile[4]={TEXT("CGDATA\\bg.bmp"),TEXT("CGDATA\\bg1.bmp"),TEXT("CGDATA\\bg2.bmp"),TEXT("CGDATA\\bg3.bmp")};
 
 #endif
 
@@ -40,18 +41,29 @@ void CALLBACK TimerProc(HWND hWnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 	pMainWnd->m_point.y+=6;
 	
 	
+	wchar_t * temp;
+
 	charconst++;
 
 	if(charconst>=30)charconst=0;
 	
-	pMainWnd->OnPaint ();
+	
 
-
-	if(pMainWnd->m_point.x>GAME_WINDOW_WIDTH/2)
+	if(pMainWnd->m_point.x>=GAME_WINDOW_WIDTH)
 	{
 		pMainWnd->m_point=CPoint(0,0);
-		::KillTimer (hWnd,1);
+		//::KillTimer (hWnd,1);
+		temp=bgfile[0];
+		bgfile[0]=bgfile[3];
+		bgfile[3]=temp;
+
+		temp=bgfile[1];
+		bgfile[1]=bgfile[2];
+		bgfile[2]=temp;
+
 	}
+	
+	pMainWnd->OnPaint ();
 
 	
 }
@@ -130,10 +142,10 @@ void CMainWnd::DrawBackground()
 	bgParameter.b4pics =TRUE;
 	//bgParameter.point =CPoint(GAME_WINDOW_WIDTH/2,GAME_WINDOW_HEIGHT/2);
 	bgParameter.point=m_point;
-	bgParameter.part_topleft=TEXT("bg.bmp");
-	bgParameter.part_topright =TEXT("CGDATA\\bg1.bmp");
-	bgParameter.part_bottomleft =TEXT("CGDATA\\bg2.bmp");
-	bgParameter.part_bottomright =TEXT("CGDATA\\bg3.bmp");
+	bgParameter.part_topleft=bgfile[0];
+	bgParameter.part_topright =bgfile[1];
+	bgParameter.part_bottomleft =bgfile[2];
+	bgParameter.part_bottomright =bgfile[3];
 
 	this->m_ly_background ->DrawBackground (&bgParameter);
 
