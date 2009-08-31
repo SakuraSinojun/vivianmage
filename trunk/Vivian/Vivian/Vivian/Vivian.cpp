@@ -13,12 +13,13 @@
 //////////////////////////////////////////////////////////////////
 
 #include "Vivian.h"
+#include "stdio.h"
 
 #include "libFade\MainWnd.h"
 
 
 #define _ONIDLE_
-#undef	_ONIDLE_
+//#undef	_ONIDLE_
 
 
 
@@ -27,7 +28,8 @@ HINSTANCE m_hInstance;
 
 CMainWnd * pMainWnd;
 
-
+DWORD	oTime=0;
+LONG	framecount=0;
 
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -202,12 +204,30 @@ BOOL VVRegisterClass()
 
 BOOL OnIdle(long count)
 {
-	wchar_t temp[100];
 
-	::wsprintf(temp,TEXT("%ld"),count);
-	::SetWindowText (m_hWnd,temp);
+	pMainWnd->OnIdle (count);
 
+	framecount++;
+	
+	DWORD t=::GetTickCount ();
+	double fps;
+	char temp[100];
+
+	if(oTime==0)
+	{
+		oTime=t;
+	}else{
+		if(t-oTime>=1000)
+		{
+			fps=((double)framecount)*1000.0/(double)(t-oTime);
+			oTime=t;
+			framecount=0;
+			sprintf_s(temp,"FPS:%3.2f",fps);
+			::SetWindowTextA (m_hWnd,temp);
+		}
+	}
 	return TRUE;
+
 }
 BOOL PreTranslateMessage(MSG * msg)
 {

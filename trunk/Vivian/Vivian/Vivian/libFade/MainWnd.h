@@ -21,9 +21,11 @@ public:
 
 	BOOL	OnPaint();
 	void	OnLButtonDown(WPARAM wParam,CPoint point);
+	BOOL	OnIdle(LONG lcount);
 
 	void	DrawBackground();
 	void	DrawCharacter();
+	void	DrawMonster(LPCTSTR filename,CRect rectInPic,CPoint point2Draw);
 
 public:
 	CLayer	*	m_ly_background;
@@ -50,7 +52,7 @@ private:
 
 	HBITMAP	m_bitmap_background;
 	HBITMAP	m_bitmap_character;
-
+	HBITMAP m_bitmap_monster;
 
 
 //temp:

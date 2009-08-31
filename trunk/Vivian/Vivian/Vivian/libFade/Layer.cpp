@@ -112,8 +112,23 @@ void CLayer::DrawCharacter(LPCTSTR filename)
 
 }
 
+void CLayer::DrawMonster(LPCTSTR filename,CRect rectInPic,CPoint point2Draw)
+{
+	
+	HDC memDC=::CreateCompatibleDC(this->m_hdc);
+	HBITMAP hBitmap=(HBITMAP)::LoadImage(NULL,filename,IMAGE_BITMAP,0,0,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
+	::SelectObject (memDC,hBitmap);
 
+	
+	::StretchBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,memDC,0,0,1,1,SRCCOPY);
+
+	::BitBlt (m_hdc,point2Draw.x,point2Draw.y,rectInPic.Width (),rectInPic.Height (),memDC,rectInPic.left ,rectInPic.top ,SRCCOPY);
+
+	::DeleteObject (hBitmap);
+	::DeleteDC (memDC);
+
+}
 
 
 

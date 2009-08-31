@@ -16,6 +16,7 @@ public:
 
 	void	DrawBackground(PBKGNDPARAMETER pBGParameter);
 	void	DrawCharacter(LPCTSTR filename);
+	void	DrawMonster(LPCTSTR filename,CRect rectInPic,CPoint point2Draw);
 
 public:
 	BOOL bDraw;
