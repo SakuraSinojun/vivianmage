@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vivian", "Vivian.vcproj", "{4B842710-58F8-449D-B22F-E9F35723FDAE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B842710-58F8-449D-B22F-E9F35723FDAE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4B842710-58F8-449D-B22F-E9F35723FDAE}.Debug|Win32.Build.0 = Debug|Win32
+		{4B842710-58F8-449D-B22F-E9F35723FDAE}.Release|Win32.ActiveCfg = Release|Win32
+		{4B842710-58F8-449D-B22F-E9F35723FDAE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
