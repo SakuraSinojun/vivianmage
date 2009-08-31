@@ -4,7 +4,8 @@
 //	FileName	:	MainWnd.cpp
 //	Author		:	SakuraSinojun
 //	Description	:	a class of the main window
-//	
+//					主窗口的所有操作与消息响应都在这里完成。
+//
 //	Version		:	1.0.0.1
 //	Date		:	2009.8.30
 //
@@ -21,9 +22,12 @@
 
 
 
-
+//pMainWnd指向了主窗口。
 extern CMainWnd * pMainWnd;
 
+
+
+//以下是测试各绘图结构所用代码。
 
 #ifdef __MainWnd_Debug_
 
@@ -66,6 +70,10 @@ int ExplosionCount=268;
 
 #endif
 
+
+
+//渲染函数。。。
+//由OnIdle调用的函数。。渲染事件全部在这里完成。。
 //void CALLBACK TimerProc(HWND hWnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 void Render()
 {
@@ -152,7 +160,10 @@ void Render()
 CMainWnd::CMainWnd(HWND hWnd)
 {
 	this->m_hWnd=hWnd;
+	
 
+
+	//为各绘图Layer分配DC和画布。
 	this->m_hdc =::CreateCompatibleDC(::GetDC(hWnd));
 	this->m_bitmap =::CreateCompatibleBitmap (::GetDC(hWnd),GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
 	this->m_hdc_background =::CreateCompatibleDC(::GetDC(hWnd));
@@ -169,11 +180,14 @@ CMainWnd::CMainWnd(HWND hWnd)
 	::SelectObject (m_hdc_monster,m_bitmap_monster);
 
 
+	//以下代码留待扩展
 	for(int i=0;i<=9;i++)
 	{
 		this->m_layer [i].bDraw =FALSE;
 	}
 
+
+	//调整指向。
 	this->m_ly_background =&m_layer[0];
 	this->m_ly_character =&m_layer[1];
 	this->m_ly_mask =&m_layer[2];
@@ -181,6 +195,7 @@ CMainWnd::CMainWnd(HWND hWnd)
 	this->m_ly_text =&m_layer[4];
 	this->m_ly_monster =&m_layer[5];
 
+	//设定画布
 	this->m_ly_background ->SetDC (m_hdc_background);
 	this->m_ly_animate ->SetDC(m_hdc);
 	this->m_ly_character ->SetDC(m_hdc_character);
@@ -188,6 +203,7 @@ CMainWnd::CMainWnd(HWND hWnd)
 	this->m_ly_text ->SetDC (m_hdc);
 	this->m_ly_monster ->SetDC (m_hdc_monster);
 
+	//待扩展
 	this->m_ly_background->bDraw =TRUE;
 	this->m_ly_character->bDraw=TRUE;
 	this->m_ly_mask->bDraw=TRUE;
@@ -195,8 +211,13 @@ CMainWnd::CMainWnd(HWND hWnd)
 	this->m_ly_text->bDraw=TRUE;
 	this->m_ly_monster ->bDraw =TRUE;
 
+	//测试地图用变量。
 	this->m_point =CPoint(0,0);
+
+	
+	//确定pMainWnd指向
 	pMainWnd=this;
+
 }
 
 CMainWnd::~CMainWnd() 
@@ -216,31 +237,35 @@ CMainWnd::~CMainWnd()
 BOOL CMainWnd::OnPaint ()
 {
 
-		
+	
 	::BitBlt (::GetDC(m_hWnd),0,0,GAME_WINDOW_WIDTH+1,GAME_WINDOW_HEIGHT+1,this->m_hdc,0,0,SRCCOPY);
 	
 	return TRUE;
 }
 
+
+//绘制背景用测试函数。
+//此函数完成背景的四张CG拼接。
 void CMainWnd::DrawBackground()
 {
 
-
-	BKGNDPARAMETER bgParameter;
+	BKGNDPARAMETER bgParameter;				//BKGNDPARAMETER结构存储了四张CG的信息。
 
 	memset(&bgParameter,0,sizeof(bgParameter));
-	bgParameter.b4pics =TRUE;
-	//bgParameter.point =CPoint(GAME_WINDOW_WIDTH/2,GAME_WINDOW_HEIGHT/2);
-	bgParameter.point=m_point;
-	bgParameter.part_topleft=bgfile[0];
-	bgParameter.part_topright =bgfile[1];
-	bgParameter.part_bottomleft =bgfile[2];
-	bgParameter.part_bottomright =bgfile[3];
+	bgParameter.b4pics =TRUE;					//由四张拼接而不是单一背景显示。
+	bgParameter.point=m_point;					//接鏠坐标
+	bgParameter.part_topleft=bgfile[0];			//左上图
+	bgParameter.part_topright =bgfile[1];		//右上图
+	bgParameter.part_bottomleft =bgfile[2];		//左下图
+	bgParameter.part_bottomright =bgfile[3];	//右下图
 
-	this->m_ly_background ->DrawBackground (&bgParameter);
-
-	::BitBlt (m_hdc,0,0,GAME_WINDOW_WIDTH+1,GAME_WINDOW_HEIGHT+1,this->m_hdc_background,0,0,SRCCOPY);
+	this->m_ly_background ->DrawBackground (&bgParameter);		//背景layer的绘制。
 	
+	
+	//hdc是个临时DC，所有的中间绘制过程全部画到hdc上后再一起blt到前景上。
+	::BitBlt (m_hdc,0,0,GAME_WINDOW_WIDTH+1,GAME_WINDOW_HEIGHT+1,this->m_hdc_background,0,0,SRCCOPY);	
+
+
 }
 
 void CMainWnd::DrawCharacter()

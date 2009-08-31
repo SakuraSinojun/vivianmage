@@ -39,6 +39,7 @@ BOOL CLayer::SetDC (HDC hdc)
 	return FALSE;
 }
 
+
 void CLayer::DrawBackground(PBKGNDPARAMETER pBGParameter)
 {
 	HDC memDC=::CreateCompatibleDC (this->m_hdc );
