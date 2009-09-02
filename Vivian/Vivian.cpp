@@ -12,10 +12,17 @@
 //
 //////////////////////////////////////////////////////////////////
 
+
+#define __DEBUG_DD_
+
 #include "Vivian.h"
 #include "stdio.h"
 
 #include "libFade\MainWnd.h"
+
+#include "libFade\DirectDraw.h"
+
+#include "libFade\preLoad.h"
 
 
 #define _ONIDLE_
@@ -23,13 +30,28 @@
 
 
 
+//窗口、句柄
 HWND m_hWnd;
 HINSTANCE m_hInstance;
-
 CMainWnd * pMainWnd;
 
+
+//FPS计算
 DWORD	oTime=0;
 LONG	framecount=0;
+char FPS[100];
+
+//DirectDraw
+CDirectDraw DirectDraw;
+void	InitD3D();  
+void	Cleanup();
+void	iRender();
+
+//设置选项
+bool	_win=false;			//是否在窗口模式运行。窗口下不能用DirectDraw，而是用GDI绘图，刷新速率需自行控制。
+
+
+//-----------------------------------------------------------------------------------------------------------------------
 
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -39,6 +61,18 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	m_hInstance=hInstance;
 	pMainWnd=NULL;
 
+	
+	//pl::test();
+
+	if(lstrcmpA(lpCmdLine,"-w")==0)
+	{
+		_win=true;
+	}else{
+		_win=false;
+	}
+
+	//_win=true;
+	
 	int res= run();
 
 
@@ -81,7 +115,6 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 		case WM_ERASEBKGND:
 			if(OnEraseBkGnd())
 				return TRUE;
-
 			break;
 		case WM_MOUSEMOVE:
 			OnMouseMove(wParam,CPoint(lParam));
@@ -91,6 +124,9 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 			break;
 		case WM_RBUTTONDOWN:
 			OnRButtonDown(wParam,CPoint(lParam));
+			break;
+		case WM_TIMER:
+			//DirectDraw.Flip ();
 			break;
 		default:
 			break;
@@ -156,12 +192,14 @@ BOOL VVCreateWindow()
 
 	m_hWnd = CreateWindowEx(0, TEXT("VVWindow"), 
 								TEXT("VVRPG"), 
-								WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX,
+								(_win)?(WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX):WS_POPUP,
 								CW_USEDEFAULT, CW_USEDEFAULT, rect.Width() , rect.Height (), 
 								HWND_DESKTOP, NULL, m_hInstance, NULL);
 	if(m_hWnd==NULL)
 		return FALSE;
 	
+	InitD3D();
+
 	return TRUE;
 }
 
@@ -172,7 +210,7 @@ BOOL VVRegisterClass()
 	wcex.cbClsExtra = 0;
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.cbWndExtra = 0;
-	wcex.hbrBackground = (HBRUSH)::GetStockObject (WHITE_BRUSH);
+	wcex.hbrBackground = (HBRUSH)::GetStockObject (BLACK_BRUSH);
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
@@ -204,15 +242,10 @@ BOOL VVRegisterClass()
 
 BOOL OnIdle(long count)
 {
-
-	pMainWnd->OnIdle (count);
-
 	framecount++;
 	
 	DWORD t=::GetTickCount ();
 	double fps;
-	char temp[100];
-
 	if(oTime==0)
 	{
 		oTime=t;
@@ -222,10 +255,14 @@ BOOL OnIdle(long count)
 			fps=((double)framecount)*1000.0/(double)(t-oTime);
 			oTime=t;
 			framecount=0;
-			sprintf_s(temp,"FPS:%3.2f",fps);
-			::SetWindowTextA (m_hWnd,temp);
+			sprintf_s(FPS,"FPS:%3.2f",fps);
 		}
 	}
+
+	::SetWindowTextA(m_hWnd,FPS);
+
+	pMainWnd->OnIdle (count);
+
 	return TRUE;
 
 }
@@ -237,6 +274,9 @@ BOOL PreTranslateMessage(MSG * msg)
 void OnCreate(HWND hWnd)
 {
 	pMainWnd=new CMainWnd(hWnd);
+	//::SetTimer (hWnd,1,16,NULL);
+	pMainWnd->OnCreate ();
+
 
 }
 
@@ -248,6 +288,7 @@ BOOL OnDestroy()
 
 BOOL OnClose()
 {
+	Cleanup();
 	//if(6==::MessageBox(m_hWnd,TEXT("确定要退出？"),TEXT("结束游戏"),MB_YESNO))
 	{
 		PostQuitMessage(0);
@@ -273,10 +314,40 @@ void OnMouseMove(WPARAM wParam,CPoint point)
 
 void OnPaint()
 {
-	pMainWnd->OnPaint ();
+	//pMainWnd->OnPaint ();
 }
 
 BOOL OnEraseBkGnd()
 {
 	return TRUE;
+}
+
+
+
+//-----------------------------------------------------------------------------------------------------------------------
+void	InitD3D()
+{
+	if(_win)
+	{
+
+	}else{
+#ifdef __DEBUG_DD_
+		if(DirectDraw.Create (m_hWnd,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,CDirectDraw::FullColor))
+		{
+		}else{
+		}
+		return ;
+#endif
+	}
+
+}
+
+void	Cleanup()
+{
+
+}
+
+void iRender()
+{
+	
 }

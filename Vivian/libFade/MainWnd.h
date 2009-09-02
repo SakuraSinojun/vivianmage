@@ -2,9 +2,8 @@
 
 #pragma once
 
+#include "..\stdafx.h"
 
-#include <windows.h>
-#include "..\typedef.h"
 
 #include "Layer.h"
 
@@ -20,12 +19,21 @@ public:
 public:
 
 	BOOL	OnPaint();
+	void	OnCreate();
 	void	OnLButtonDown(WPARAM wParam,CPoint point);
 	BOOL	OnIdle(LONG lcount);
 
 	void	DrawBackground();
 	void	DrawCharacter();
-	void	DrawMonster(LPCTSTR filename,CRect rectInPic,CPoint point2Draw);
+	void	DrawMonster(LPCSTR filename,CRect rectInPic,CPoint point2Draw);
+	void	DrawMonster2(LPCSTR filename,CRect rectInPic,CPoint point2Draw);
+	void	DrawMonster3(LPCSTR filename,CRect rectInPic,CPoint point2Draw);
+	void	DrawChat(LPCSTR filename);
+
+	int		AddText(LPCTSTR filename,LPCTSTR text);
+	void	ModifyTextPic(int index,LPCTSTR filename);	
+	void	ModifyText(int index,LPCTSTR text);
+	void	KillText(int index);
 
 public:
 	CLayer	*	m_ly_background;
@@ -35,11 +43,14 @@ public:
 	CLayer	*	m_ly_animate;
 	CLayer	*	m_ly_text;
 
+
 private:
 
 	CLayer m_layer[10];
 
 	HWND	m_hWnd;
+	HDC		m_wnd_dc;
+
 	HDC		m_hdc;
 	HBITMAP	m_bitmap;
 	
@@ -53,10 +64,20 @@ private:
 	HBITMAP	m_bitmap_background;
 	HBITMAP	m_bitmap_character;
 	HBITMAP m_bitmap_monster;
+	HBITMAP m_bitmap_text;
 
 
 //temp:
 public:
 	CPoint m_point;
 
+
 };
+
+
+
+
+
+
+
+

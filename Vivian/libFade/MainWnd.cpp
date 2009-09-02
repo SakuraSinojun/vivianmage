@@ -18,24 +18,37 @@
 
 #pragma comment (lib,"MSIMG32.LIB")
 
-#define __MainWnd_Debug_
+#include "DirectDraw.h"
 
+#include "preLoad.h"
 
 
 //pMainWnd指向了主窗口。
 extern CMainWnd * pMainWnd;
 
+//extern	LPDIRECTDRAWSURFACE	lpDDSPrimary;
+//extern	LPDIRECTDRAWSURFACE	lpDDSBack;
+//extern	LPDIRECTDRAW		lpDD;
+//extern	LPDIRECTDRAWSURFACE lpSurface;
+
+extern	CDirectDraw DirectDraw;
+
+extern char FPS[100];
+
+//配置
+extern bool _win;
 
 
 //以下是测试各绘图结构所用代码。
+#define __MainWnd_Debug_
 
 #ifdef __MainWnd_Debug_
 
-wchar_t	*	charfile[3]={TEXT("CGDATA\\CHAR.bmp"),TEXT("CGDATA\\CHAR1.bmp"),TEXT("CGDATA\\CHAR2.bmp")};
+char	*	charfile[3]={"CGDATA\\CHAR.bmp","CGDATA\\CHAR1.bmp","CGDATA\\CHAR2.bmp"};
 int			charconst=0;
-wchar_t *	bgfile[4]={TEXT("CGDATA\\bg.bmp"),TEXT("CGDATA\\bg1.bmp"),TEXT("CGDATA\\bg2.bmp"),TEXT("CGDATA\\bg3.bmp")};
+char	*	bgfile[4]={"CGDATA\\bg.bmp","CGDATA\\bg1.bmp","CGDATA\\bg2.bmp","CGDATA\\bg3.bmp"};
 
-wchar_t *	monsterfile=TEXT("CGDATA\\witch.bmp");
+char	 *	monsterfile="CGDATA\\witch.bmp";
 
 struct MONSTERWAY
 {
@@ -45,10 +58,10 @@ struct MONSTERWAY
 	CRect	rect[3];
 };
 
-MONSTERWAY	monster1way[4]={{-8,6,10,CRect(1,1,53,75),CRect(54,1,106,75),CRect(107,1,159,75)},
-							{8,6,50,CRect(1,76,53,150),CRect(54,76,106,150),CRect(107,76,159,150)},
-							{8,-6,10,CRect(1,151,53,225),CRect(1,151,53,225),CRect(1,151,53,225)},
-							{-8,-6,50,CRect(1,226,53,300),CRect(1,226,53,300),CRect(1,226,53,300)}};
+MONSTERWAY	monster1way[4]={{-4,3,20,CRect(1,1,53,75),CRect(54,1,106,75),CRect(107,1,159,75)},
+							{4,3,100,CRect(1,76,53,150),CRect(54,76,106,150),CRect(107,76,159,150)},
+							{4,-3,20,CRect(1,151,53,225),CRect(1,151,53,225),CRect(1,151,53,225)},
+							{-4,-3,100,CRect(1,226,53,300),CRect(1,226,53,300),CRect(1,226,53,300)}};
 int	monster1waycount=0;
 int monster1waynow=0;
 CPoint monster1point=CPoint(100,10);
@@ -78,11 +91,12 @@ int ExplosionCount=268;
 void Render()
 {
 
-	pMainWnd->m_point.x+=8;
-	pMainWnd->m_point.y+=6;
+	pMainWnd->m_point.x+=4;
+	pMainWnd->m_point.y+=3;
+	//pMainWnd->m_point =CPoint(320,240);
 	
 	
-	wchar_t * temp;
+	char * temp;
 
 	charconst++;
 	monster1count++;
@@ -93,6 +107,9 @@ void Render()
 	if(charconst>=30)charconst=0;
 	if(monster1actioncount>=12)monster1actioncount=0;
 	if(monster2actioncount>=12)monster2actioncount=0;
+
+
+
 
 
 	if(pMainWnd->m_point.x>=GAME_WINDOW_WIDTH)
@@ -108,8 +125,6 @@ void Render()
 		bgfile[2]=temp;
 	}
 
-
-	pMainWnd->DrawBackground();
 	
 
 	if(monster1count>monster1way[monster1waynow].step_count)
@@ -133,13 +148,15 @@ void Render()
 	monster2point.y+=monster2way[monster2waynow].increment_of_y ;
 
 
+	pMainWnd->DrawBackground();
 	
+
 	pMainWnd->DrawMonster (monsterfile,monster1way[monster1waynow].rect[(int)(monster1actioncount/4)],monster1point);
 	
 	pMainWnd->DrawCharacter();
 
 	
-	pMainWnd->DrawMonster (monsterfile,monster2way[monster2waynow].rect[(int)(monster2actioncount/4)],monster2point);
+	pMainWnd->DrawMonster2(monsterfile,monster2way[monster2waynow].rect[(int)(monster2actioncount/4)],monster2point);
 
 
 	
@@ -147,12 +164,15 @@ void Render()
 
 	if(ExplosionCount>=737)ExplosionCount=268;
 
-	pMainWnd->DrawMonster (TEXT("CGDATA\\Explosion.bmp"),CRect((int)(ExplosionCount/67)*67,0,(int)(ExplosionCount/67)*67+66,100),CPoint(320,240));
+	pMainWnd->DrawMonster3 ("CGDATA\\Explosion.bmp",CRect((int)(ExplosionCount/67)*67,0,(int)(ExplosionCount/67)*67+66,100),CPoint(320,240));
 
 
+	pMainWnd->DrawChat("CGDATA\\chat.bmp");
 
 	pMainWnd->OnPaint ();
 
+
+	//Sleep(1000);
 	
 }
 
@@ -160,18 +180,21 @@ void Render()
 CMainWnd::CMainWnd(HWND hWnd)
 {
 	this->m_hWnd=hWnd;
-	
+	this->m_wnd_dc=::GetDC(hWnd);	
 
 
 	//为各绘图Layer分配DC和画布。
-	this->m_hdc =::CreateCompatibleDC(::GetDC(hWnd));
-	this->m_bitmap =::CreateCompatibleBitmap (::GetDC(hWnd),GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
-	this->m_hdc_background =::CreateCompatibleDC(::GetDC(hWnd));
-	this->m_bitmap_background =::CreateCompatibleBitmap (::GetDC(hWnd),GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
-	this->m_hdc_character =::CreateCompatibleDC(::GetDC(hWnd));
-	this->m_bitmap_character =::CreateCompatibleBitmap (::GetDC(hWnd),GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
-	this->m_hdc_monster =::CreateCompatibleDC (::GetDC(hWnd));
-	this->m_bitmap_monster=::CreateCompatibleBitmap (::GetDC(hWnd),GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
+	this->m_hdc =::CreateCompatibleDC(m_wnd_dc);
+	this->m_bitmap =::CreateCompatibleBitmap (m_wnd_dc,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
+	this->m_hdc_background =::CreateCompatibleDC(m_wnd_dc);
+	this->m_bitmap_background =::CreateCompatibleBitmap (m_wnd_dc,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
+	this->m_hdc_character =::CreateCompatibleDC(m_wnd_dc);
+	this->m_bitmap_character =::CreateCompatibleBitmap (m_wnd_dc,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
+	this->m_hdc_monster =::CreateCompatibleDC (m_wnd_dc);
+	this->m_bitmap_monster=::CreateCompatibleBitmap (m_wnd_dc,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
+	this->m_hdc_text=::CreateCompatibleDC(m_wnd_dc);
+	this->m_bitmap_text=::CreateCompatibleBitmap (m_hdc_text,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
+
 
 
 	::SelectObject (m_hdc,m_bitmap);
@@ -197,6 +220,7 @@ CMainWnd::CMainWnd(HWND hWnd)
 
 	//设定画布
 	this->m_ly_background ->SetDC (m_hdc_background);
+
 	this->m_ly_animate ->SetDC(m_hdc);
 	this->m_ly_character ->SetDC(m_hdc_character);
 	this->m_ly_mask ->SetDC(m_hdc);
@@ -212,7 +236,7 @@ CMainWnd::CMainWnd(HWND hWnd)
 	this->m_ly_monster ->bDraw =TRUE;
 
 	//测试地图用变量。
-	this->m_point =CPoint(0,0);
+	this->m_point =CPoint(320,240);
 
 	
 	//确定pMainWnd指向
@@ -237,9 +261,15 @@ CMainWnd::~CMainWnd()
 BOOL CMainWnd::OnPaint ()
 {
 
-	
-	::BitBlt (::GetDC(m_hWnd),0,0,GAME_WINDOW_WIDTH+1,GAME_WINDOW_HEIGHT+1,this->m_hdc,0,0,SRCCOPY);
-	
+	if(_win)
+	{
+		::BitBlt (m_wnd_dc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,m_hdc,0,0,SRCCOPY);
+	}else{
+		DirectDraw.Draw ();
+		DirectDraw.Flip ();
+	}
+
+
 	return TRUE;
 }
 
@@ -261,30 +291,147 @@ void CMainWnd::DrawBackground()
 
 	this->m_ly_background ->DrawBackground (&bgParameter);		//背景layer的绘制。
 	
-	
-	//hdc是个临时DC，所有的中间绘制过程全部画到hdc上后再一起blt到前景上。
-	::BitBlt (m_hdc,0,0,GAME_WINDOW_WIDTH+1,GAME_WINDOW_HEIGHT+1,this->m_hdc_background,0,0,SRCCOPY);	
-
+	if(_win)
+	{
+		//m_hdc是个临时DC，所有的中间绘制过程全部画到m_hdc上后再一起blt到前景上。
+		//COLORREF	transColor=::GetPixel (this->m_hdc_background ,1,1);
+		::BitBlt (m_hdc,0,0,GAME_WINDOW_WIDTH+1,GAME_WINDOW_HEIGHT+1,this->m_hdc_background,0,0,SRCCOPY);	
+	}
 
 }
 
 void CMainWnd::DrawCharacter()
 {
-	
-	this->m_ly_character ->DrawCharacter (charfile[(int)(charconst/10)]);
+	this->m_ly_character ->DrawCharacter (charfile[(int)(charconst/10)],CPoint(64,-32));
 
-	COLORREF	transColor=::GetPixel (this->m_hdc_character ,1,1);
+	if(_win)
+	{
+		COLORREF	transColor=::GetPixel (this->m_hdc_character ,1,1);
+		::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,m_hdc_character,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,transColor);
+	}else{
 	
-	::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,m_hdc_character,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,transColor);
+	}
+}
+
+void CMainWnd::DrawMonster(LPCSTR filename,CRect rectInPic,CPoint point2Draw)
+{
+	static	bool bFirstDraw=true;
+	static	CDDSurface dds_monster;
+	COLORREF	color;
+
+	if(_win)
+	{
+		this->m_ly_monster ->DrawMonster (filename,rectInPic,point2Draw);
+		COLORREF	transColor=::GetPixel (this->m_hdc_monster ,1,1);
+		::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,m_hdc_monster,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,transColor);
+	}else{
+		if(bFirstDraw)
+		{
+			dds_monster.Load (DirectDraw,filename);
+			DirectDraw.Add (&dds_monster);	
+			color=dds_monster.GetPTColor();
+			dds_monster.SetColorKey (color);
+			dds_monster.Show ();
+			bFirstDraw=false;
+		}
+		dds_monster.SetDrawPos (point2Draw);
+		dds_monster.SetSrcRect (rectInPic);
+	}
+
+}
+void CMainWnd::DrawMonster2(LPCSTR filename,CRect rectInPic,CPoint point2Draw)
+{
+	static	bool bFirstDraw=true;
+	static	CDDSurface dds_monster;
+	COLORREF	color;
+
+	if(_win)
+	{
+		this->m_ly_monster ->DrawMonster (filename,rectInPic,point2Draw);
+		COLORREF	transColor=::GetPixel (this->m_hdc_monster ,1,1);
+		::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,m_hdc_monster,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,transColor);
+
+	}else{
+		if(bFirstDraw)
+		{
+			dds_monster.Load (DirectDraw,filename);
+			DirectDraw.Add (&dds_monster);	
+			color=dds_monster.GetPTColor();
+			dds_monster.SetColorKey (color);
+			dds_monster.Show ();
+			bFirstDraw=false;
+		}
+		dds_monster.SetDrawPos (point2Draw);
+		dds_monster.SetSrcRect (rectInPic);
+	}
+
+}
+void CMainWnd::DrawMonster3(LPCSTR filename,CRect rectInPic,CPoint point2Draw)
+{
+	static	bool bFirstDraw=true;
+	static	CDDSurface dds_monster;
+	COLORREF	color;
+
+	if(_win)
+	{
+		this->m_ly_monster ->DrawMonster (filename,rectInPic,point2Draw);
+		COLORREF	transColor=::GetPixel (this->m_hdc_monster ,1,1);
+		::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,m_hdc_monster,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,transColor);
+
+	}else{
+		if(bFirstDraw)
+		{
+			dds_monster.Load (DirectDraw,filename);
+			DirectDraw.Add (&dds_monster);	
+			color=dds_monster.GetPTColor();
+			dds_monster.SetColorKey (color);
+			dds_monster.Show ();
+			bFirstDraw=false;
+		}
+		dds_monster.SetDrawPos (point2Draw);
+		dds_monster.SetSrcRect (rectInPic);
+	}
 
 }
 
-void CMainWnd::DrawMonster(LPCTSTR filename,CRect rectInPic,CPoint point2Draw)
+void CMainWnd::DrawChat(LPCSTR filename)
 {
-	this->m_ly_monster ->DrawMonster (filename,rectInPic,point2Draw);
-	COLORREF	transColor=::GetPixel (this->m_hdc_monster ,1,1);
+	static	bool bFirstDraw=true;
+	static	CDDSurface dds_chat;
+	CDDSurface dds_temp;
 
-	::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,m_hdc_monster,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,transColor);
+
+	COLORREF	color;
+
+	if(_win)
+	{
+		HDC memDC=pl::Load (filename);
+		color=::GetPixel (memDC,1,1);
+		::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,memDC,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,color);
+		TextOutA(m_hdc,210,380,FPS,lstrlenA(FPS));
+
+	}else{
+		
+		if(bFirstDraw)
+		{
+			dds_chat.Load (DirectDraw,filename);
+			DirectDraw.Add (&dds_chat);	
+			color=dds_chat.GetPTColor();
+			dds_chat.SetColorKey (color);
+			dds_chat.Show ();
+			bFirstDraw=false;
+		}
+
+		
+		HDC hdc;
+		dds_chat->GetDC(&hdc);
+		//::SetBkMode (hdc,TRANSPARENT);
+		::SetTextColor (hdc,RGB(0,0,0));
+		TextOutA(hdc,210,380,FPS,lstrlenA(FPS));
+		dds_chat->ReleaseDC (hdc);
+		
+
+	}
 
 
 }
@@ -312,3 +459,18 @@ BOOL CMainWnd::OnIdle(LONG lcount)
 }
 
 
+void CMainWnd::OnCreate()
+{
+	/*
+	pl::Load ("CGDATA\\bg.bmp");
+	pl::Load ("CGDATA\\bg1.bmp");
+	pl::Load ("CGDATA\\bg2.bmp");
+	pl::Load ("CGDATA\\bg3.bmp");
+	pl::Load ("CGDATA\\char.bmp");
+	pl::Load ("CGDATA\\char1.bmp");
+	pl::Load ("CGDATA\\char2.bmp");
+	pl::Load ("CGDATA\\chat.bmp");
+	pl::Load ("CGDATA\\witch.bmp");
+	*/
+
+}

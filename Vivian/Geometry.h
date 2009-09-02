@@ -69,6 +69,7 @@ class CRect: public tagRECT {
 	CRect();
 	CRect(int x1, int y1, int x2, int y2);
 	CRect(const RECT &rect);
+	CRect(CPoint point,CSize size);
 
 	int Width() const;
 	int Height() const;
@@ -289,6 +290,14 @@ inline CRect::CRect(const RECT &rect)
 	top = rect.top;
 	right = rect.right;
 	bottom = rect.bottom;
+}
+
+inline CRect::CRect (CPoint point,CSize size)
+{
+	left=point.x;
+	top=point.y;
+	right=point.x+size.cx;
+	bottom=point.y+size.cy;
 }
 
 inline int CRect::Width() const

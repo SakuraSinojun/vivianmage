@@ -12,8 +12,7 @@
 
 #pragma once
 
-#include "windows.h"
-#include "typedef.h"
+#include "stdafx.h"
 
 
 BOOL	run();

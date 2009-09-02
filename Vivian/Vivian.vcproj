@@ -22,6 +22,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			UseOfMFC="0"
+			UseOfATL="0"
 			CharacterSet="1"
 			>
 			<Tool
@@ -183,8 +184,24 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="äÖÈ¾Àà"
+			Name="Í¼ÐÎÒýÇæ"
 			>
+			<File
+				RelativePath=".\libFade\DDSurface.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\DDSurface.h"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\DirectDraw.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\DirectDraw.h"
+				>
+			</File>
 			<File
 				RelativePath=".\FadeDocument.txt"
 				>
@@ -198,11 +215,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\libFade\libFade.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libFade\MainWnd.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\libFade\MainWnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\preLoad.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\preLoad.h"
 				>
 			</File>
 		</Filter>
@@ -217,6 +246,14 @@
 			>
 			<File
 				RelativePath=".\Geometry.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StdAfx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StdAfx.h"
 				>
 			</File>
 			<File
