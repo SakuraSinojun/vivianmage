@@ -242,8 +242,7 @@ BOOL VVRegisterClass()
 
 BOOL OnIdle(long count)
 {
-	framecount++;
-	
+	framecount++;	
 	DWORD t=::GetTickCount ();
 	double fps;
 	if(oTime==0)

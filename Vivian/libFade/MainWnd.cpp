@@ -87,7 +87,31 @@ int ExplosionCount=268;
 
 //渲染函数。。。
 //由OnIdle调用的函数。。渲染事件全部在这里完成。。
-//void CALLBACK TimerProc(HWND hWnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
+extern LONG framecount;
+extern DWORD oTime;
+void Render();
+void CALLBACK TimerProc(HWND hWnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
+{
+	framecount++;	
+	DWORD t=::GetTickCount ();
+	double fps;
+	if(oTime==0)
+	{
+		oTime=t;
+	}else{
+		if(t-oTime>=1000)
+		{
+			fps=((double)framecount)*1000.0/(double)(t-oTime);
+			oTime=t;
+			framecount=0;
+			sprintf_s(FPS,"FPS:%3.2f",fps);
+		}
+	}
+
+	::SetWindowTextA(hWnd,FPS);
+
+	Render();
+}
 void Render()
 {
 
@@ -160,7 +184,7 @@ void Render()
 
 
 	
-	ExplosionCount+=(67/2);
+	ExplosionCount+=(67/4);
 
 	if(ExplosionCount>=737)ExplosionCount=268;
 
@@ -171,8 +195,6 @@ void Render()
 
 	pMainWnd->OnPaint ();
 
-
-	//Sleep(1000);
 	
 }
 
@@ -448,7 +470,6 @@ void CMainWnd::DrawChat(LPCSTR filename)
 
 void CMainWnd::OnLButtonDown(WPARAM wParam,CPoint point)
 {
-	//::SetTimer(m_hWnd,1,10,TimerProc);
 
 }
 
@@ -472,5 +493,9 @@ void CMainWnd::OnCreate()
 	pl::Load ("CGDATA\\chat.bmp");
 	pl::Load ("CGDATA\\witch.bmp");
 	*/
+
+#ifndef _ONIDLE_
+	::SetTimer(m_hWnd,1,31,TimerProc);
+#endif
 
 }
