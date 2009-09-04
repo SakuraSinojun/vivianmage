@@ -13,6 +13,8 @@
 
 
 
+#pragma once
+
 #ifndef __DDSerface_h__
 #define __DDSerface_h__
 
@@ -26,28 +28,30 @@
 
 #include <string>
 
+#include "Surface.h"
 
 class CDirectDraw;
 //class CDibSection;
 
-class CDDSurface
+class CDDSurface:public CSurface
 {
 public:
 	CDDSurface();
 	~CDDSurface();
-	HRESULT Create(CDirectDraw &dd,int width,int height,bool sysmem=false);
-	HRESULT CreatePrimary(CDirectDraw &dd);
+
+	HRESULT Create(int width,int height);
+	HRESULT CreatePrimary();
 	HRESULT AttachBackBuffer(CDDSurface &_surface);
 	HRESULT Restore();
 	HRESULT Release();
 	virtual HRESULT RestoreImage();
 	virtual HRESULT Draw(LPDIRECTDRAWSURFACE draw,DDSURFACEDESC &ddsd);
-	HRESULT Load(CDirectDraw &dd,const char * name,bool sysmem=false);
+	HRESULT Load(const char * name );
 	HRESULT GetPixelFormat();
 	HRESULT Fade(CDDSurface *s1,CDDSurface *s2,int level);
 	HRESULT FadeFast(CDDSurface *s1,CDDSurface *s2,int level);
 
-	HRESULT SetColorKey(COLORREF color=RGB(0,255,0),DWORD flag=DDCKEY_SRCBLT);
+	HRESULT SetColorKey(COLORREF color=RGB(0,255,0));
 	DWORD Color(DWORD r,DWORD g,DWORD b) const;
 	DWORD Red(DWORD color)const;
 	DWORD Green(DWORD color)const;
@@ -70,10 +74,13 @@ public:
 	LPDIRECTDRAWSURFACE Get(){return surface;}
 	LPDIRECTDRAWSURFACE operator->(){return surface;}
 
+	void * Add();
+
 protected:
 	HRESULT Load();
 
 protected:
+
 	LPDIRECTDRAWSURFACE	surface;		//»æÍ¼Ò³
 	DDPIXELFORMAT		pixelformat;	//ÏñËØ¸ñÊ½
 	std::string			path;			//BMPÂ·¾¶

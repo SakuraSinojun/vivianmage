@@ -21,6 +21,141 @@
 #include "preLoad.h"
 
 
+
+CLayer * CLayer::first=NULL;
+CLayer * CLayer::last=NULL;
+
+
+CLayer::CLayer(void * _surface)
+{
+	surface=_surface;
+	prev=NULL;
+	next=NULL;
+
+}
+
+CLayer::~CLayer()
+{
+	Remove();
+}
+
+CLayer * CLayer::AddLayer(void * _surface)
+{
+	CLayer * _layer=new CLayer(_surface);
+	if(last==NULL)
+	{
+		first=_layer;
+	}else{
+		last->next =_layer;
+		_layer->prev=last;
+	}
+	last=_layer;
+	return _layer;
+
+}
+
+void CLayer::RemoveLayer(CLayer * _layer)
+{
+	delete _layer;
+}
+
+void CLayer::Remove ()
+{
+	CLayer * prev;
+	CLayer * next;
+	prev=this->prev;
+	next=this->next;
+	if(prev!=NULL)
+	{
+		prev->next=next;
+	}
+	if(next!=NULL)
+	{
+		next->prev=prev;
+	}
+
+}
+
+bool CLayer::MoveForward()
+{
+	void * _surface;
+	if(prev==NULL)
+	{
+		return false;
+	}
+	_surface=surface ;
+	surface=prev->surface ;
+	prev->surface=_surface;
+	return true;
+}
+
+bool CLayer::MoveBehind()
+{
+	void * _surface;
+	if(next==NULL)
+	{
+		return false;
+	}
+	_surface=surface ;
+	surface=next->surface ;
+	next->surface=_surface;
+	return true;
+}
+
+void CLayer::SetAfter(CLayer * _layer)
+{
+	CLayer * lynext;
+	
+	if(_layer==NULL)
+		return;
+	
+	this->Remove ();
+
+	lynext=_layer->next;
+	_layer->next=this;
+	this->prev=_layer;
+	this->next=lynext;
+	if(lynext!=NULL)
+	{
+		lynext->prev=this;
+	}else{
+		last=this;
+	}
+
+}
+
+void CLayer::SetBefore(CLayer * _layer)
+{
+	CLayer * lybf;
+
+	if(_layer==NULL)
+		return;
+	
+	this->Remove();
+	lybf=_layer->prev;
+	_layer->prev=this;
+	this->next=_layer;
+	this->prev=lybf;
+	if(lybf!=NULL)
+	{
+		lybf->next=this;
+	}else{
+		first=this;
+	}
+
+}
+
+
+
+
+
+#ifdef __LAYER_
+#undef __LAYER_
+#endif
+
+#ifdef __LAYER_
+/*
+
 extern	CDirectDraw			DirectDraw;
 extern	char				FPS[100];
 
@@ -32,13 +167,6 @@ extern bool _win;
 CLayer::CLayer()
 	:m_hdc(NULL)
 {
-	/*
-	m_hbitmap_background_1=NULL;
-	m_hbitmap_background_2=NULL;
-	m_hbitmap_background_3=NULL;
-	m_hbitmap_background_4=NULL;
-	*/
-//	m_hbitmap_character=NULL;
 
 	m_hdc_background_1=NULL;
 	m_hdc_background_2=NULL;
@@ -51,20 +179,6 @@ CLayer::~CLayer()
 {
 	if(_win)
 	{
-		/*
-
-		::DeleteDC(m_hdc_background_1);
-		::DeleteDC(m_hdc_background_2);
-		::DeleteDC(m_hdc_background_3);
-		::DeleteDC(m_hdc_background_4);
-		::DeleteDC(m_hdc_character);
-		
-		::DeleteObject (m_hbitmap_background_1);
-		::DeleteObject (m_hbitmap_background_2);
-		::DeleteObject (m_hbitmap_background_3);
-		::DeleteObject (m_hbitmap_background_4);
-		*/
-		//::DeleteObject (m_hbitmap_character);
 
 	}
 }
@@ -77,13 +191,6 @@ BOOL CLayer::SetDC (HDC hdc)
 	
 		if(_win)
 		{
-			/*
-			m_hdc_background_1=::CreateCompatibleDC (hdc);
-			m_hdc_background_2=::CreateCompatibleDC (hdc);
-			m_hdc_background_3=::CreateCompatibleDC (hdc);
-			m_hdc_background_4=::CreateCompatibleDC (hdc);
-			m_hdc_character=::CreateCompatibleDC(hdc);
-			*/
 		}
 		return TRUE;
 	}
@@ -223,21 +330,18 @@ void CLayer::DrawMonster(LPCSTR filename,CRect rectInPic,CPoint point2Draw)
 		::SetBkColor (m_hdc,color);
 		CRect rc=CRect(0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT);
 		::ExtTextOutW(m_hdc,0,0,ETO_OPAQUE,&rc,NULL,0,0);
-		
-		::BitBlt (m_hdc,point2Draw.x,point2Draw.y,rectInPic.Width (),rectInPic.Height (),memDC,rectInPic.left ,rectInPic.top ,SRCCOPY);
-		
+	
+		::BitBlt (m_hdc,point2Draw.x,point2Draw.y,rectInPic.Width (),rectInPic.Height (),memDC,rectInPic.left ,rectInPic.top ,SRCCOPY);		
 	}else{
-
 
 	}
 
-
 }
 
+*/
 
 
-
-
+#endif
 
 
 

@@ -11,6 +11,7 @@
 using namespace std;
 
 
+
 CDirectDraw::CDirectDraw ()
 {
 	dd=NULL;
@@ -23,6 +24,19 @@ CDirectDraw::~CDirectDraw()
 	//exit(0);
 	//ReleaseAllObjects();
 
+}
+
+//向列表中添加绘图页
+void * CDirectDraw::Add(CDDSurface *s) 
+{
+	surface.push_back (s);
+	return NULL;
+}
+
+//从列表中删除
+void CDirectDraw::Remove(CDDSurface *s) 
+{
+	surface.remove(s);
 }
 
 

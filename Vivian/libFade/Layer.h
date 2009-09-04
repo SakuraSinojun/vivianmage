@@ -11,9 +11,45 @@
 class CLayer
 {
 public:
-	CLayer();
+	CLayer(){prev=NULL;next=NULL;surface=NULL;}
+	CLayer(void * _surface);
 	~CLayer();
 
+	void * Get(){return surface;}
+	void SetSurface(void * _surface){surface=_surface;}
+
+
+	bool MoveForward();
+	bool MoveBehind();
+	void SetAfter(CLayer * _layer);
+	void SetBefore(CLayer * _layer);
+
+	CLayer * operator++(){MoveForward();return this;}
+	CLayer * operator--(){MoveBehind();return this;}
+	
+	static CLayer * AddLayer(void * _surface);
+	static void RemoveLayer(CLayer * _layer);
+
+	void Remove();
+
+public:
+	CLayer * next;
+	CLayer * prev;
+	static CLayer * first;
+	static CLayer * last;
+
+	
+private:
+	
+	void * surface;
+
+};
+
+
+
+
+
+/*
 	BOOL SetDC(HDC hdc);
 	
 
@@ -55,3 +91,4 @@ private:
 	CDDSurface m_Monster;
 
 };
+*/

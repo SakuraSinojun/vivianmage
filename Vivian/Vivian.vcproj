@@ -23,7 +23,7 @@
 			ConfigurationType="1"
 			UseOfMFC="0"
 			UseOfATL="0"
-			CharacterSet="1"
+			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -187,31 +187,7 @@
 			Name="图形引擎"
 			>
 			<File
-				RelativePath=".\libFade\DDSurface.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\DDSurface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\DirectDraw.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\DirectDraw.h"
-				>
-			</File>
-			<File
 				RelativePath=".\FadeDocument.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\Layer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\Layer.h"
 				>
 			</File>
 			<File
@@ -227,6 +203,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\libFade\Monster.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\libFade\Monster.h"
+				>
+			</File>
+			<File
 				RelativePath=".\libFade\preLoad.cpp"
 				>
 			</File>
@@ -234,6 +218,62 @@
 				RelativePath=".\libFade\preLoad.h"
 				>
 			</File>
+			<Filter
+				Name="GraphicEngine"
+				>
+				<File
+					RelativePath=".\libFade\DDSurface.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\DDSurface.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\DirectDraw.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\DirectDraw.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Draw.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Draw.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\GDIDraw.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\GDIDraw.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\GDISurface.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\GDISurface.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Layer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Layer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Surface.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="资源文件"

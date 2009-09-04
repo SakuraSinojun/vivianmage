@@ -1,13 +1,15 @@
 
 [2009/09/02]
 
-	1	GetDC(hWnd)函数返回后所占用的内存并不会释放，应该在一开始用变量保存这个值，而不应该用时再取。
+	1	GetDC(hWnd)函数返回后所占用的内存并不会释放，除非调用了ReleaseDC();
 	2	StretchBlt函数那是相当之慢。。。
 	3	Rectangle和ExtTextOut其实速度差不多。。据说Rectangle函数内部也是调用的ExtTextOutW来绘图。
 	4	GetPixel比想象中的要快。
 	5	TransparentBlt时，非COLORKEY像素越多，绘制越慢。
 	
+[2009/09/03]
 	
+	发现API:AlphaBlend
 	
 	
 	

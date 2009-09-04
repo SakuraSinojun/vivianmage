@@ -5,7 +5,8 @@
 #include "..\stdafx.h"
 
 
-#include "Layer.h"
+/*
+//#include "Layer.h"
 
 
 class CMainWnd
@@ -36,17 +37,10 @@ public:
 	void	KillText(int index);
 
 public:
-	CLayer	*	m_ly_background;
-	CLayer	*	m_ly_character;
-	CLayer	*	m_ly_monster;
-	CLayer	*	m_ly_mask;
-	CLayer	*	m_ly_animate;
-	CLayer	*	m_ly_text;
-
+	
 
 private:
 
-	CLayer m_layer[10];
 
 	HWND	m_hWnd;
 	HDC		m_wnd_dc;
@@ -66,8 +60,12 @@ private:
 	HBITMAP m_bitmap_monster;
 	HBITMAP m_bitmap_text;
 
+	
+	char * hdc_bits;
+
 
 //temp:
+
 public:
 	CPoint m_point;
 
@@ -81,3 +79,4 @@ public:
 
 
 
+*/

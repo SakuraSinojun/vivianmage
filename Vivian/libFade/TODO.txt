@@ -1,0 +1,37 @@
+
+class CShop
+{
+	CreateShop();
+	CreateItem(file,count,desc);
+	ShowItem(bool);
+	SetItemPos();
+};
+
+
+class CGameDialog
+{
+	Create();
+	CreateButton();
+	CreateEdit();		//нд╠╬©Р
+	CreateText();		//ндвж
+
+};
+
+class CGameMenu : CGameDialog
+{
+	CreateMenu(Title);
+	AddMenu();
+	DelMenu();
+	
+
+};
+
+
+class CCursor
+{
+	CreateCursor(...int Alpha);
+	SetCurPos();
+	SetCurSize();
+	MoveCursorTo();
+	SetCursorSpeed();
+}

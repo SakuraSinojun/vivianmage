@@ -4,8 +4,7 @@
 
 
 
-
-
+#pragma once
 
 #ifndef __DirectDraw_h__
 #define __DirectDraw_h__
@@ -18,6 +17,8 @@
 
 
 #include "DDSurface.h"
+
+class CDDSurface;
 
 class CDirectDraw
 {
@@ -34,7 +35,7 @@ public:
 	void ReleaseAllObjects();
 	HRESULT RestoreAll();
 	HRESULT Flip();
-	void Add(CDDSurface *s);
+	void * Add(CDDSurface *s);
 	void Remove(CDDSurface *s);
 	virtual bool Draw();
 	CSize GetSize() const { return size;}
@@ -53,16 +54,6 @@ protected:
 };
 
 
-//向列表中添加绘图页
-inline void CDirectDraw::Add(CDDSurface *s) 
-{
-	surface.push_back (s);
-}
 
-//从列表中删除
-inline void CDirectDraw::Remove(CDDSurface *s) 
-{
-	surface.remove(s);
-}
 
 #endif

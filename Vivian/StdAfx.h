@@ -15,6 +15,12 @@
 #pragma comment(lib,"ddraw.lib")
 
 
+#pragma comment(lib,"winmm.lib")
+
+#pragma comment (lib,"MSIMG32.LIB")
+
+
+
 /*
 #include <D3D9.h>
 #pragma comment(lib,"d3d9.lib")

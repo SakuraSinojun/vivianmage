@@ -28,7 +28,8 @@ typedef struct tagBKGNDPARAMETER
 #define GAME_WINDOW_WIDTH	640
 #define GAME_WINDOW_HEIGHT	480
 
-
+#define _ONIDLE_
+//#undef	_ONIDLE_
 
 
 #define TRACE(quote) MessageBox(NULL,TEXT(quote),TEXT(""),MB_OK);exit(0);

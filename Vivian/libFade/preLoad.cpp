@@ -11,13 +11,15 @@ namespace pl
 	public:
 		HDCLINK(LPCSTR filename)
 		{
-			hdc=::CreateCompatibleDC(::GetDC(0));
+			HDC h=::GetDC(0);
+			hdc=::CreateCompatibleDC(h);
 			hBitmap=(HBITMAP)::LoadImageA(0,filename,IMAGE_BITMAP,0,0,LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 			SelectObject(hdc,hBitmap);
 			GetObject(hBitmap,sizeof(bitmap),&bitmap);
 			next=NULL;
 			prev=NULL;
 			lstrcpyA(this->filename,filename);
+			::ReleaseDC(NULL,h);
 		}
 		~HDCLINK()
 		{

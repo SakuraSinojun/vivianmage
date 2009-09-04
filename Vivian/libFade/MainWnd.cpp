@@ -16,6 +16,13 @@
 
 #include "MainWnd.h"
 
+
+#ifdef __MAINWND_
+#undef __MAINWND_
+#endif
+
+#ifdef __MAINWND_
+
 #pragma comment (lib,"MSIMG32.LIB")
 
 #include "DirectDraw.h"
@@ -90,8 +97,10 @@ int ExplosionCount=268;
 extern LONG framecount;
 extern DWORD oTime;
 void Render();
-void CALLBACK TimerProc(HWND hWnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
+void CALLBACK TimerProc(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2)
 {
+	HWND hWnd=(HWND)dwUser;
+
 	framecount++;	
 	DWORD t=::GetTickCount ();
 	double fps;
@@ -112,6 +121,7 @@ void CALLBACK TimerProc(HWND hWnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 
 	Render();
 }
+
 void Render()
 {
 
@@ -277,6 +287,9 @@ CMainWnd::~CMainWnd()
 	::DeleteObject (m_bitmap_character);
 	::DeleteObject (m_bitmap_monster);
 
+	
+	delete []hdc_bits;
+
 }
 
 
@@ -416,24 +429,107 @@ void CMainWnd::DrawMonster3(LPCSTR filename,CRect rectInPic,CPoint point2Draw)
 
 }
 
+void Fade(char * dst,int depth1,char * src,int depth2,int pixelcount,int level,bool ColorKey=true)
+{
+	int i;
+	
+	COLORREF color;
+	
+	BYTE r1;
+	BYTE g1;
+	BYTE b1;
+	BYTE r2;
+	BYTE g2;
+	BYTE b2;
+
+	int bc1=depth1;
+	int bc2=depth2;
+
+	color=0;
+	memcpy(&color,src,bc2);
+	
+	COLORREF tc;
+	
+	COLORREF t1,t2;
+
+	for(i=0;i<pixelcount;i++)
+	{
+		tc=0;
+		memcpy(&tc,src+i*bc2,bc2);
+		if(ColorKey && tc==color)
+		{
+			continue;
+		}
+		
+		t1=0;
+		t2=0;
+		memcpy(&t1,dst+i*bc1,bc1);
+		memcpy(&t2,src+i*bc2,bc2);
+		
+		r1=GetRValue(t1);
+		g1=GetGValue(t1);
+		b1=GetBValue(t1);
+		r2=GetRValue(t2);
+		g2=GetGValue(t2);
+		b2=GetBValue(t2);
+		
+		r1=r1-(r1-r2)*level/256;
+		g1=g1-(g1-g2)*level/256;
+		b1=b1-(b1-b2)*level/256;
+
+		t1=RGB(r1,g1,b1);
+		memcpy(dst+i*bc1,&t1,bc1);
+	}
+
+
+}
+
 void CMainWnd::DrawChat(LPCSTR filename)
 {
 	static	bool bFirstDraw=true;
 	static	CDDSurface dds_chat;
-	CDDSurface dds_temp;
+	//CDDSurface dds_temp;
 
+	
 
 	COLORREF	color;
 
 	if(_win)
 	{
-		HDC memDC=pl::Load (filename);
+		
+		//这里加个半透明算法试试速度如何。
+		BITMAP b;
+		HDC memDC=pl::Load (filename,&b);
 		color=::GetPixel (memDC,1,1);
+
+		/*
+		HBITMAP b2;
+		char * bm1;
+		//可以由GetObject取DibSection。	
+		bm1=(char *)b.bmBits ;
+		::GetObject (m_bitmap,sizeof(b2),&b2);
+		int cb=GAME_WINDOW_WIDTH*GAME_WINDOW_HEIGHT*b2.bmBitsPixel/8 ;
+		::GetBitmapBits (m_bitmap,cb,hdc_bits);
+		Fade(hdc_bits,b2.bmBitsPixel/8,bm1,b.bmBitsPixel/8,GAME_WINDOW_WIDTH*GAME_WINDOW_HEIGHT,200);
+		::SetBitmapBits(m_bitmap,cb,hdc_bits);
+		return ;
+		*/
+
+
+#if GAME_WINDOW_WIDTH==640
 		::TransparentBlt (m_hdc,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,memDC,0,0,GAME_WINDOW_WIDTH,GAME_WINDOW_HEIGHT,color);
+#else
+		::TransparentBlt (m_hdc,0,0,b.bmWidth,b.bmHeight,memDC,0,0,b.bmWidth,b.bmHeight,color);
+#endif
+
 		TextOutA(m_hdc,210,380,FPS,lstrlenA(FPS));
 
 	}else{
 		
+		//dds_chat.Show (false);
+		//DirectDraw.Draw ();
+		//dds_chat.Show(true);
+
 		if(bFirstDraw)
 		{
 			dds_chat.Load (DirectDraw,filename);
@@ -443,6 +539,20 @@ void CMainWnd::DrawChat(LPCSTR filename)
 			dds_chat.Show ();
 			bFirstDraw=false;
 		}
+		
+
+		/*
+		CDDSurface dds_back;
+		CDDSurface dds_temp;
+	
+		CRect rc(0,0,640,480);
+
+		dds_temp.Load(DirectDraw,filename);
+		dds_back.Create (DirectDraw,640,480);
+		dds_back->BltFast (0,0,DirectDraw.GetDrawable (),&rc,DDBLTFAST_WAIT);
+		
+		dds_chat.FadeFast (&dds_temp,&dds_back,128);
+		*/
 
 		
 		HDC hdc;
@@ -451,7 +561,6 @@ void CMainWnd::DrawChat(LPCSTR filename)
 		::SetTextColor (hdc,RGB(0,0,0));
 		TextOutA(hdc,210,380,FPS,lstrlenA(FPS));
 		dds_chat->ReleaseDC (hdc);
-		
 
 	}
 
@@ -495,7 +604,20 @@ void CMainWnd::OnCreate()
 	*/
 
 #ifndef _ONIDLE_
-	::SetTimer(m_hWnd,1,31,TimerProc);
+//	::SetTimer(m_hWnd,1,31,TimerProc);
+
+
+	::timeSetEvent (33,1,TimerProc,(DWORD_PTR)m_hWnd,TIME_PERIODIC);
+
 #endif
+	
+	hdc_bits=new char[GAME_WINDOW_WIDTH * GAME_WINDOW_HEIGHT *8];
+	
 
 }
+
+
+#endif
+
+
+

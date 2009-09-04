@@ -9,6 +9,11 @@
 
 
 
+#include "Draw.h"
+
+//extern CDirectDraw CDraw::DirectDraw;	//DirectDraw对象。
+
+CDirectDraw * dd;
 
 CDDSurface::CDDSurface() :
 	src_pos(0,0),
@@ -19,7 +24,7 @@ CDDSurface::CDDSurface() :
 	colorkey(false),
 	backbuffer(false)
 {
-
+	dd=&CDraw::GetDirectDraw ();
 }
 
 CDDSurface::~CDDSurface() 
@@ -43,8 +48,9 @@ static int BitShift(DWORD bits)
 
 
 //建立绘图页
-HRESULT CDDSurface::Create(CDirectDraw &dd, int width, int height, bool sysmem) 
+HRESULT CDDSurface::Create(int width, int height) 
 {
+	bool sysmem=false;
 	DDSURFACEDESC ddsd;
 	memset(&ddsd,0,sizeof(ddsd));
 	ddsd.dwSize =sizeof(ddsd);
@@ -57,7 +63,7 @@ HRESULT CDDSurface::Create(CDirectDraw &dd, int width, int height, bool sysmem)
 	size.cx =width;
 	size.cy=height;
 	draw_size=size;
-	HRESULT result=dd->CreateSurface(&ddsd,&surface,0);
+	HRESULT result=(*dd)->CreateSurface(&ddsd,&surface,0);
 	if(result==DD_OK)
 		result=GetPixelFormat();
 	return result;
@@ -66,7 +72,7 @@ HRESULT CDDSurface::Create(CDirectDraw &dd, int width, int height, bool sysmem)
 
 
 //建立主绘图页
-HRESULT CDDSurface::CreatePrimary(CDirectDraw &dd) 
+HRESULT CDDSurface::CreatePrimary() 
 {
 	DDSURFACEDESC	ddsd;
 	memset(&ddsd,0,sizeof(ddsd));
@@ -74,10 +80,11 @@ HRESULT CDDSurface::CreatePrimary(CDirectDraw &dd)
 	ddsd.dwFlags =DDSD_CAPS| DDSD_BACKBUFFERCOUNT;
 	ddsd.ddsCaps.dwCaps =DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
 	ddsd.dwBackBufferCount =1;
-	HRESULT result=dd->CreateSurface (&ddsd,&surface,0);
+	HRESULT result=(*dd)->CreateSurface (&ddsd,&surface,0);
 	if(result==DD_OK)
 		result=GetPixelFormat();
-	size=dd.GetSize ();
+	size=dd->GetSize ();
+	
 	return result;
 }
 
@@ -172,8 +179,10 @@ HRESULT CDDSurface::Draw(LPDIRECTDRAWSURFACE draw, DDSURFACEDESC &ddsd)
 }
 
 //加载BMP文件
-HRESULT CDDSurface::Load(CDirectDraw &dd, const char * name, bool sysmem) 
+HRESULT CDDSurface::Load(const char * name) 
 {
+
+	bool sysmem=false;
 
 	BITMAP bitmap;
 	HDC memDC=pl::Load(name,&bitmap);
@@ -182,7 +191,7 @@ HRESULT CDDSurface::Load(CDirectDraw &dd, const char * name, bool sysmem)
 	HRESULT result=DD_OK;
 	if(!surface)
 	{
-		result=Create(dd,bitmap.bmWidth ,bitmap.bmHeight,sysmem);
+		result=Create(bitmap.bmWidth ,bitmap.bmHeight);
 		if(result!=DD_OK)
 			return result;
 	}
@@ -222,8 +231,9 @@ HRESULT CDDSurface::Load()
 
 
 //设定透明色
-HRESULT CDDSurface::SetColorKey(COLORREF color , DWORD flag) 
+HRESULT CDDSurface::SetColorKey(COLORREF color) 
 {
+	DWORD flag=DDCKEY_SRCBLT;
 	if(surface)
 	{
 		DDCOLORKEY ddck;
@@ -288,7 +298,7 @@ HRESULT CDDSurface::Fade(CDDSurface *s1, CDDSurface *s2, int level)
 		{
 			for (int y = 0; y < size.cy; y++) {
 				DWORD *p = (DWORD *)Lock0.GetBits(0, y);
-				const DWORD *q1 = (const DWORD *)Lock1.GetBits(0, y);
+				const DWORD *q1 = (const DWORD *)Lock1.GetBits(0, y);		//这里是不是加个COLORKEY的判断。。以仅仅Cross一部分。。
 				const DWORD *q2 = (const DWORD *)Lock2.GetBits(0, y);
 				for (int x = 0; x < size.cx; x++) {
 					DWORD data1 = *q1++;
@@ -455,11 +465,9 @@ L24:
 }
 
 
-
-
-
-
-
-
+void * CDDSurface::Add()
+{
+	return (*dd).Add (this);
+}
 
 
