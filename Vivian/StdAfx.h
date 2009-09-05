@@ -4,6 +4,7 @@
 
 
 
+#include "Memory.h"
 
 #include <windows.h>
 
@@ -20,6 +21,7 @@
 #pragma comment (lib,"MSIMG32.LIB")
 
 
+//#define new new(__FILE__,__LINE__)
 
 /*
 #include <D3D9.h>

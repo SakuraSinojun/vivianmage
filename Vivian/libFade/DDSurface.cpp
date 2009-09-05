@@ -22,8 +22,11 @@ CDDSurface::CDDSurface() :
 	surface(0),
 	show(false),
 	colorkey(false),
-	backbuffer(false)
+	backbuffer(false),
+	dst_bits(NULL),
+	painter(NULL)
 {
+	iFadeLevel=255;
 	dd=&CDraw::GetDirectDraw ();
 }
 
@@ -31,6 +34,13 @@ CDDSurface::~CDDSurface()
 {
 	if(surface && !backbuffer)
 		surface->Release ();
+
+	if(dst_bits!=NULL)
+	{
+		delete dst_bits;
+	}
+
+
 }
 
 
@@ -65,7 +75,14 @@ HRESULT CDDSurface::Create(int width, int height)
 	draw_size=size;
 	HRESULT result=(*dd)->CreateSurface(&ddsd,&surface,0);
 	if(result==DD_OK)
+	{
+		DDBLTFX ddbltfx;
+		ZeroMemory(&ddbltfx,sizeof(ddbltfx));
+		ddbltfx.dwSize=sizeof(ddbltfx);
+		ddbltfx.dwFillColor=0;
+		surface->Blt(NULL,NULL,NULL,DDBLT_COLORFILL | DDBLT_WAIT,&ddbltfx);	
 		result=GetPixelFormat();
+	}
 	return result;
 
 }
@@ -153,12 +170,22 @@ HRESULT CDDSurface::RestoreImage ()
 //绘图
 HRESULT CDDSurface::Draw(LPDIRECTDRAWSURFACE draw, DDSURFACEDESC &ddsd) 
 {
+	if(painter!=NULL)
+	{
+		HDC hdc;
+		draw->GetDC(&hdc);
+		painter->prePaint (hdc);
+		draw->ReleaseDC(hdc);
+	}
+
 	if(!show || !surface)
 		return DD_OK;
 	int width=ddsd.dwWidth ;
 	int height=ddsd.dwHeight ;
+
+
 	CRect dst(draw_pos.x,draw_pos.y,draw_pos.x+draw_size.cx,draw_pos.y+draw_size.cy);
-	if(dst.left >=width || dst.right <=0 || dst.top >=height || dst.bottom <=0)
+	if(dst.left >=width || dst.right <=0 || dst.top >=height || dst.bottom <=0)				
 		return DD_OK;
 
 	if(dst.left <0)
@@ -169,14 +196,169 @@ HRESULT CDDSurface::Draw(LPDIRECTDRAWSURFACE draw, DDSURFACEDESC &ddsd)
 		dst.top =0;
 	if(dst.bottom >height)
 		dst.bottom =height;
+
 	CRect src(CPoint(src_pos.x+dst.left-draw_pos.x,src_pos.y+dst.top-draw_pos.y),dst.Size ());
+	
 
 	DDBLTFX ddbltfx;
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize =sizeof(ddbltfx);
-	return draw->Blt (&dst,surface,&src,DDBLT_WAIT | (colorkey?DDBLT_KEYSRC:0),&ddbltfx);
+
+	
+	HRESULT res;
+
+	SetColorKey(colorkey);
+
+	if(this->iFadeLevel>=255 || iFadeLevel<=0)
+	{
+		res=draw->Blt (&dst,surface,&src,DDBLT_WAIT | (colorkey?DDBLT_KEYSRC:0),&ddbltfx);
+	}else{
+		ColorKeyFade(draw,this->Get());
+		res=DD_OK;
+	}
+	
+	if(painter!=NULL)
+	{
+		HDC hdc;
+		draw->GetDC(&hdc);
+		painter->OnPaint (hdc);
+		draw->ReleaseDC(hdc);
+	}
+	
+	return res;
 
 }
+
+
+void CDDSurface::ColorKeyFade(LPDIRECTDRAWSURFACE lps1, LPDIRECTDRAWSURFACE lps3)
+{
+
+	CRect rc_dst(draw_pos,draw_size);
+	CRect rc_src;
+	
+	if(rc_dst.left <0)
+		rc_dst.left =0;
+	if(rc_dst.top <0)
+		rc_dst.top =0;
+	if(rc_dst.right >size.cx)
+		rc_dst.right =size.cx ;
+	if(rc_dst.bottom >size.cy)
+		rc_dst.bottom =size.cy;
+
+	rc_src.left =src_pos.x+rc_dst.left-draw_pos.x;
+	rc_src.top =src_pos.y+rc_dst.top-draw_pos.y;
+	rc_src.right =rc_src.left+draw_size.cx;
+	rc_src.bottom =rc_src.top+draw_size.cy;
+
+
+	DDSURFACEDESC sppp1;
+	DDSURFACEDESC sppp3;
+
+	memset(&sppp1,0,sizeof(sppp1));
+	memset(&sppp3,0,sizeof(sppp3));
+
+
+	sppp1.dwSize=sizeof(sppp1);
+	sppp3.dwSize=sizeof(sppp3);
+
+	//锁定表面
+	lps1->Lock(NULL, &sppp1, DDLOCK_WAIT, NULL);
+	lps3->Lock(NULL, &sppp3, DDLOCK_WAIT, NULL);
+
+
+	//获取像素
+	char *dst;
+	char *src;
+	
+	char *dst_buffer=(char *)sppp1.lpSurface;
+	char *src_buffer=(char *)sppp3.lpSurface ;
+
+	int lp3=(int)sppp3.lPitch;
+	int lp1=(int)sppp1.lPitch;
+
+	int depth=this->Depth ()/8;
+
+	COLORREF t1;
+	COLORREF t2;
+
+	BYTE r1,r2;
+	BYTE g1,g2;
+	BYTE b1,b2;
+
+	int i,j;
+	
+	ptcolor=0;
+	memcpy(&ptcolor,src_buffer,depth);
+
+	for(j=rc_dst.top ;j<rc_dst.bottom;j++)
+	{
+		for(i=rc_dst.left ;i<rc_dst.right ;i++)
+		{
+			
+			dst=dst_buffer+j*lp1+i*depth;
+			src=src_buffer+(rc_src.top+j-rc_dst.top)*lp3+(rc_src.left+i-rc_dst.left)*depth;
+			
+			if(colorkey)
+			{
+				t2=0;
+				memcpy(&t2,src,depth);
+				if(t2==ptcolor)
+					continue;
+			}
+
+			t1=0;
+			t2=0;
+			memcpy(&t1,dst,depth);
+			memcpy(&t2,src,depth);
+			
+			r1=GetRValue(t1);
+			g1=GetGValue(t1);
+			b1=GetBValue(t1);
+			r2=GetRValue(t2);
+			g2=GetGValue(t2);
+			b2=GetBValue(t2);
+			
+			r1=r1-(r1-r2)*iFadeLevel/256;
+			g1=g1-(g1-g2)*iFadeLevel/256;
+			b1=b1-(b1-b2)*iFadeLevel/256;
+
+			t1=RGB(r1,g1,b1);
+			memcpy(dst,&t1,depth);
+		
+		}
+	}
+
+	//释放表面
+	lps3->Unlock(0);
+	lps1->Unlock(0);
+
+
+
+}
+
+
+
+void CDDSurface::SetFadeLevel(int level)
+{
+	iFadeLevel=level;
+	
+	/*
+	if(level==255)
+		return;
+	if(size.cx== 0 || size.cy==0)
+	{
+		return;
+	}
+	if(dst_bits!=NULL)
+	{
+		delete dst_bits;
+	}
+	dst_bits=(char *)NEW DWORD[size.cx *size.cy];
+	*/
+
+}
+
+
 
 //加载BMP文件
 HRESULT CDDSurface::Load(const char * name) 
@@ -184,8 +366,8 @@ HRESULT CDDSurface::Load(const char * name)
 
 	bool sysmem=false;
 
-	BITMAP bitmap;
 	HDC memDC=pl::Load(name,&bitmap);
+	m_hdc=memDC;
 
 	path=name;
 	HRESULT result=DD_OK;
@@ -214,9 +396,9 @@ HRESULT CDDSurface::Load(const char * name)
 //再次加载bmp
 HRESULT CDDSurface::Load()
 {
-	BITMAP bitmap;
 	HDC memDC=pl::Load(path.c_str(),&bitmap);
-
+	m_hdc=memDC;
+	
 	HRESULT result=DD_OK;
 	HDC hdc;
 
@@ -226,13 +408,23 @@ HRESULT CDDSurface::Load()
 		result=BitBlt(hdc,0,0,bitmap.bmWidth ,bitmap.bmHeight ,memDC,0,0,SRCCOPY);
 		surface->ReleaseDC (hdc);
 	}
+	
+	ptcolor=::GetPixel (memDC,1,1);
+
 	return result;
 }
 
 
 //设定透明色
-HRESULT CDDSurface::SetColorKey(COLORREF color) 
+HRESULT CDDSurface::SetColorKey(bool bColorKey) 
 {
+	colorkey=bColorKey;
+	HDC hdc;
+	surface->GetDC(&hdc);
+	this->ptcolor =GetPixel(hdc,1,1);
+	surface->ReleaseDC(hdc);
+
+	COLORREF color=this->ptcolor;
 	DWORD flag=DDCKEY_SRCBLT;
 	if(surface)
 	{

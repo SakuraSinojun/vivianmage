@@ -54,11 +54,13 @@ CLayer * CLayer::AddLayer(void * _surface)
 
 }
 
+//删除layer.
 void CLayer::RemoveLayer(CLayer * _layer)
 {
 	delete _layer;
 }
 
+//从Layer链表中移除
 void CLayer::Remove ()
 {
 	CLayer * prev;
@@ -76,32 +78,47 @@ void CLayer::Remove ()
 
 }
 
+//前置
 bool CLayer::MoveForward()
 {
-	void * _surface;
-	if(prev==NULL)
-	{
-		return false;
-	}
-	_surface=surface ;
-	surface=prev->surface ;
-	prev->surface=_surface;
-	return true;
-}
-
-bool CLayer::MoveBehind()
-{
-	void * _surface;
 	if(next==NULL)
 	{
 		return false;
 	}
-	_surface=surface ;
-	surface=next->surface ;
-	next->surface=_surface;
-	return true;
+
+	CLayer * _ly=next;
+	return _ly->MoveBehind ();
+
 }
 
+//后置
+bool CLayer::MoveBehind()
+{
+	if(prev==NULL)
+	{
+		return false;
+	}
+
+	CLayer * lyprev;
+	CLayer * lynext;
+	lynext=this->prev;
+	lyprev=lynext->prev;
+	this->Remove ();
+	this->prev=lyprev;
+	if(lyprev!=NULL)
+	{
+		lyprev->next =this;
+	}else{
+		CLayer::first =this;
+	}
+	this->next=lynext;
+	lynext->prev=this;
+
+	return true;
+
+}
+
+//于_layer之后绘制，即放置于_layer上方。
 void CLayer::SetAfter(CLayer * _layer)
 {
 	CLayer * lynext;
@@ -124,6 +141,7 @@ void CLayer::SetAfter(CLayer * _layer)
 
 }
 
+//于_layer之前绘制，即放置于_layer下方。
 void CLayer::SetBefore(CLayer * _layer)
 {
 	CLayer * lybf;

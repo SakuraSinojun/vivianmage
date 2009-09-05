@@ -9,7 +9,7 @@
 #ifndef __DirectDraw_h__
 #define __DirectDraw_h__
 
-#include <list>
+//#include <list>
 
 #include "ddraw.h"
 #pragma comment(lib,"dxguid.lib")
@@ -44,12 +44,12 @@ public:
 	LPDIRECTDRAWSURFACE& GetPrimary(){return primary;}
 
 protected:
-	typedef std::list<CDDSurface *> surface_list;
+	//typedef std::list<CDDSurface *> surface_list;
 	LPDIRECTDRAW		dd;			//DirectDraw¶ÔÏó
 	LPDIRECTDRAWSURFACE primary;	//Ö÷»æÍ¼Ò³
 	LPDIRECTDRAWSURFACE back;		//±³¾°»æÍ¼Ò³
 
-	surface_list		surface;	//»æÍ¼Ò³ÁÐ±í
+	//surface_list		surface;	//»æÍ¼Ò³ÁÐ±í
 	CSize				size;
 };
 

@@ -4,9 +4,12 @@
 
 #include "DirectDraw.h"
 
-#include <list>
+//#include <list>
 #include <algorithm>
 #include <functional>
+
+#include "Layer.h"
+
 
 using namespace std;
 
@@ -26,17 +29,29 @@ CDirectDraw::~CDirectDraw()
 
 }
 
+
+
 //向列表中添加绘图页
 void * CDirectDraw::Add(CDDSurface *s) 
 {
-	surface.push_back (s);
-	return NULL;
+	//surface.push_back (s);
+	return CLayer::AddLayer ((void *)s);
 }
 
 //从列表中删除
 void CDirectDraw::Remove(CDDSurface *s) 
 {
-	surface.remove(s);
+	//surface.remove(s);
+	CLayer * _layer=CLayer::first;
+	CLayer * _ly;
+
+	while(_layer!=NULL)
+	{
+		_ly=_layer->next;
+		if(_layer->Get()==(void *)s)
+			delete _layer;
+		_layer=_ly;
+	}
 }
 
 
@@ -110,10 +125,16 @@ void CDirectDraw::ReleaseAllObjects()
 {
 	if(dd)
 	{
-		for_each(surface.begin(),surface.end(),mem_fun(&CDDSurface::Release));
+		//for_each(surface.begin(),surface.end(),mem_fun(&CDDSurface::Release));
+		CLayer * _layer=CLayer::first;
+		while(_layer!=NULL)
+		{
+			((CDDSurface *)_layer->Get())->Release();
+			_layer=_layer->next;
+		}
 		if(primary)
 		{
-//			primary->Release();
+			primary->Release();
 			primary=NULL;
 		}
 		dd->Release();
@@ -124,7 +145,16 @@ void CDirectDraw::ReleaseAllObjects()
 
 HRESULT CDirectDraw::RestoreAll() 
 {
-	for_each(surface.begin (),surface.end(),mem_fun(&CDDSurface::Restore));
+	//for_each(surface.begin (),surface.end(),mem_fun(&CDDSurface::Restore));
+	
+	CLayer * _layer=CLayer::first;
+	while(_layer!=NULL)
+	{
+		((CDDSurface *)_layer->Get())->Restore ();
+		_layer=_layer->next;
+	}
+
+
 	HRESULT result=primary->Restore ();
 	if(result!=DD_OK)
 		return result;
@@ -135,6 +165,9 @@ HRESULT CDirectDraw::RestoreAll()
 //绘图
 bool CDirectDraw::Draw ()
 {
+#ifndef CLEAR_BEFORE_DRAWING
+#define CLEAR_BEFORE_DRAWING
+#endif
 #ifdef CLEAR_BEFORE_DRAWING
 	DDBLTFX ddbltfx;
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
@@ -150,6 +183,7 @@ bool CDirectDraw::Draw ()
 	DWORD result=DD_OK;
 	do
 	{
+		/*
 		for(surface_list::iterator p=surface.begin ();p!=surface.end ();p++)
 		{
 			result=(*p)->Draw(back,ddsd);
@@ -163,6 +197,24 @@ bool CDirectDraw::Draw ()
 				return false;
 			}
 		}
+		*/
+
+		CLayer * _layer=CLayer::first;	
+		while(_layer!=NULL)
+		{
+			result=((CDDSurface *)_layer->Get())->Draw (back,ddsd);
+			if(result==DDERR_SURFACELOST)
+			{
+				if(RestoreAll()!=DD_OK)
+					return false;
+				break;
+			}else if(result!=DD_OK){
+				TRACE("DIRECT DRAW DRAW ERROR!");
+				return false;
+			}
+			_layer=_layer->next;
+		}
+
 	}while(result!=DD_OK);
 	return true;
 }

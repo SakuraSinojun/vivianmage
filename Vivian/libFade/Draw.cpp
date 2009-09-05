@@ -7,6 +7,9 @@
 #include "GDIDraw.h"
 
 
+#include "..\Memory.h"
+
+
 namespace CDraw
 {
 	//启动参数
@@ -14,6 +17,8 @@ namespace CDraw
 	bool	_idlemsg;
 	int		_winwidth;
 	int		_winheight;
+	bool	_showfps=true;
+
 	WNDPROC	_windowprocedure=NULL;
 
 	//空间变量
@@ -81,15 +86,31 @@ namespace CDraw
 
 	BOOL OnIdle(LONG count)
 	{
+		CalcFPS();
+
+		HDC hdc;
+
 		if(_win)
 		{
 			GDIDraw.Draw ();
 			GDIDraw.Flip ();
+			if(_showfps)
+			{
+				hdc=GetDC(m_hWnd);
+				TextOutA(hdc,0,0,FPS,lstrlenA(FPS));
+				ReleaseDC(m_hWnd,hdc);
+			}
 		}else{
 			DirectDraw.Draw ();
+			if(_showfps)
+			{
+				DirectDraw.GetDrawable ()->GetDC(&hdc);
+				TextOutA(hdc,0,0,FPS,lstrlenA(FPS));
+				DirectDraw.GetDrawable ()->ReleaseDC (hdc);
+			}
 			DirectDraw.Flip ();
 		}
-		CalcFPS();
+		
 		::SetWindowText (m_hWnd,FPS);
 		return TRUE;
 	}
@@ -203,16 +224,14 @@ namespace CDraw
 		}
 	}
 
-	
-	CSurface * NewSurface()
+	CSurface * CreateNewSurface()
 	{
 		if(_win)
 		{
-			return new CGDISurface();
+			return MNEW CGDISurface();
 		}else{
-			return new CDDSurface();
+			return MNEW CDDSurface();
 		}
-
 	}
 
 };

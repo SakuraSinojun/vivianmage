@@ -75,7 +75,7 @@ bool CGDIDraw::Draw()
 	CLayer * _layer=CLayer::first ;
 	while(_layer!=NULL)
 	{
-		((CGDISurface *)(_layer->Get()))->Draw (back);
+		((CGDISurface *)(_layer->Get()))->Draw (back,this->m_hWnd);
 		_layer=_layer->next;
 	}	
 	return true;

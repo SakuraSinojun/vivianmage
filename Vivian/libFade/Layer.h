@@ -23,9 +23,6 @@ public:
 	bool MoveBehind();
 	void SetAfter(CLayer * _layer);
 	void SetBefore(CLayer * _layer);
-
-	CLayer * operator++(){MoveForward();return this;}
-	CLayer * operator--(){MoveBehind();return this;}
 	
 	static CLayer * AddLayer(void * _surface);
 	static void RemoveLayer(CLayer * _layer);

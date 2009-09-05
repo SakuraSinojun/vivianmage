@@ -51,7 +51,8 @@ public:
 	HRESULT Fade(CDDSurface *s1,CDDSurface *s2,int level);
 	HRESULT FadeFast(CDDSurface *s1,CDDSurface *s2,int level);
 
-	HRESULT SetColorKey(COLORREF color=RGB(0,255,0));
+	HRESULT SetColorKey(bool bColorKey);
+
 	DWORD Color(DWORD r,DWORD g,DWORD b) const;
 	DWORD Red(DWORD color)const;
 	DWORD Green(DWORD color)const;
@@ -75,6 +76,12 @@ public:
 	LPDIRECTDRAWSURFACE operator->(){return surface;}
 
 	void * Add();
+	
+	void SetFadeLevel(int level=255);
+
+	void ColorKeyFade(LPDIRECTDRAWSURFACE lps1, LPDIRECTDRAWSURFACE lps3);
+	void SetPaintWnd(CPaintWnd * _paintwnd){painter=_paintwnd;}
+
 
 protected:
 	HRESULT Load();
@@ -98,6 +105,11 @@ protected:
 	int					grshift;
 	int					brshift;
 	COLORREF			ptcolor;		//(1,1)µãÑÕÉ«£»
+	int					iFadeLevel;
+	BITMAP				bitmap;
+	char *				dst_bits;
+	HDC					m_hdc;
+	CPaintWnd	*		painter;
 
 };
 

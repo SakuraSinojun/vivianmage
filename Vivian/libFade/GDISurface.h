@@ -13,22 +13,12 @@ public:
 	CGDISurface(void);
 	~CGDISurface(void);
 	HRESULT Create(int width,int height);	
-	virtual HRESULT Draw(HDC hdc);
+	virtual HRESULT Draw(HDC hdc,HWND hWnd);
 	HRESULT Load(const char * name);
-	HRESULT SetColorKey(COLORREF color=RGB(0,255,0));
+	HRESULT SetColorKey(bool bColorKey);
 	
-	
-	//HRESULT GetPixelFormat();
-	//HRESULT Fade(CDDSurface *s1,CDDSurface *s2,int level);
-	//HRESULT FadeFast(CDDSurface *s1,CDDSurface *s2,int level);
-	/*
-	DWORD Color(DWORD r,DWORD g,DWORD b) const;
-	DWORD Red(DWORD color)const;
-	DWORD Green(DWORD color)const;
-	DWORD Blue(DWORD color)const;
-	*/
-	
-	
+	void CGDISurface::ColorKeyFade(HDC hdc);
+
 	void * Add();
 
 	int Width() const;
@@ -43,16 +33,20 @@ public:
 	CPoint GetSrcPos()const;
 	void SetSrcRect(CRect& rect);
 	void Show(bool _show=true);
-	void SetFadeLevel(int level=256){iFadeLevel=level;}
+	
+	void SetFadeLevel(int level=255);
+
 
 	COLORREF GetPTColor(){return ptcolor;}
 	HDC Get(){return m_hdc;}
 	
 	//LPDIRECTDRAWSURFACE operator->(){return surface;}
 
+	void SetPaintWnd(CPaintWnd * _paintwnd);
+
 protected:
 
-	HDC				m_hdc;			//绘图DC
+	HDC				m_hdc;			//背景加载位图用DC
 	HBITMAP			m_hbitmap;		//关联位图，也可能是内存兼容位图。
 	BITMAP			bitmap;			//
 	char			path[MAX_PATH];	//BMP路径
@@ -62,17 +56,13 @@ protected:
 	CSize			draw_size;		//绘图大小
 	bool			show;			//当前surface显示时为true;
 	bool			colorkey;		//使用colorkey时此值为true
-	
-	/*
-	int				rshift;			//红色分量
-	int				gshift;
-	int				bshift;
-	int				rrshift;		//右分量
-	int				grshift;
-	int				brshift;
-	*/
+
 	COLORREF		ptcolor;		//(1,1)点颜色；
-	int				iFadeLevel;		//0~256交叉透明度。
+	int				iFadeLevel;		//0~255交叉透明度。
+	char	*		dst_bits;
+	char	*		bmp_bits;
+	
+	CPaintWnd	*	painter;
 
 };
 

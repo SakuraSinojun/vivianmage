@@ -274,6 +274,46 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="GameWindow"
+				>
+				<File
+					RelativePath=".\libFade\Animation.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Animation.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\GameWnd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\GameWnd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\libGameWindow.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\MapWnd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\MapWnd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\TextWnd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\TextWnd.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="资源文件"
@@ -286,6 +326,14 @@
 			>
 			<File
 				RelativePath=".\Geometry.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Memory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Memory.h"
 				>
 			</File>
 			<File

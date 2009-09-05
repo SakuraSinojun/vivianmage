@@ -22,7 +22,7 @@ namespace CDraw
 	void Attach(HWND hWnd);
 	
 	void SetWindowProcedure(WNDPROC _proc);
-	CSurface * NewSurface();
+	CSurface * CreateNewSurface();
 
 
 };
