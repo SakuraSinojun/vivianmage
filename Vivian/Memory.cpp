@@ -8,6 +8,8 @@
 #include <windows.h>
 
 
+#ifdef MEMCHECK
+
 	static long _MemorySize=0;
 	class CMLink
 	{
@@ -127,6 +129,8 @@
 	void operator delete(void * p)
 	{
 		Remove(p);
+
+		//operator delete(p);
 		free(p);
 	}
 
@@ -147,3 +151,5 @@
 
 
 
+#else
+#endif

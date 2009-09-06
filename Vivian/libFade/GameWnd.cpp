@@ -16,6 +16,8 @@ CGameWnd::~CGameWnd(void)
 	{
 		delete surface;
 	}
+	layer=NULL;
+	surface=NULL;
 }
 
 bool CGameWnd::Create(const char * filename)

@@ -1,5 +1,11 @@
+
+
 #pragma once
 
+#define MEMCHECK
+
+
+#ifdef MEMCHECK
 #define MNEW new(__FILE__,__LINE__)
 #define NEW new(__FILE__,__LINE__)
 #define MDELETE delete
@@ -15,3 +21,6 @@ bool MemoryReport(char * report,int len);
 
 
 
+#else
+#define NEW new
+#endif

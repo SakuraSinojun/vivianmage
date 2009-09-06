@@ -2,7 +2,7 @@
 #include "..\StdAfx.h"
 
 
-#include "lbiGameWindow.h"
+#include "libGameWindow.h"
 
 
 

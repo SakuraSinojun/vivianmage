@@ -45,8 +45,8 @@ CGDISurface::~CGDISurface(void)
 	if(m_hbitmap)
 	{
 		DeleteObject(m_hbitmap);
-		DeleteDC(m_hdc);
 	}
+	DeleteDC(m_hdc);
 	if(dst_bits!=NULL)
 	{
 		delete dst_bits;

@@ -228,9 +228,9 @@ namespace CDraw
 	{
 		if(_win)
 		{
-			return MNEW CGDISurface();
+			return NEW CGDISurface();
 		}else{
-			return MNEW CDDSurface();
+			return NEW CDDSurface();
 		}
 	}
 
