@@ -108,7 +108,7 @@ HRESULT CGDISurface::Create(int width,int height)
 
 }
 
-void CGDISurface::ColorKeyFade(HDC hdc)
+void CGDISurface::ColorKeyFade(HDC hdc,CSize size)
 {
 	if(dst_bits==NULL)
 		return;
@@ -128,8 +128,8 @@ void CGDISurface::ColorKeyFade(HDC hdc)
 
 	rc_src.left =src_pos.x+rc_dst.left-draw_pos.x;
 	rc_src.top =src_pos.y+rc_dst.top-draw_pos.y;
-	rc_src.right =rc_src.left+draw_size.cx;
-	rc_src.bottom =rc_src.top+draw_size.cy;
+	rc_src.right =rc_src.left+rc_dst.Width ();
+	rc_src.bottom =rc_src.top+rc_dst.Height ();
 
 
 
@@ -261,7 +261,7 @@ HRESULT CGDISurface::Draw(HDC hdc,HWND hWnd)
 	}else{
 		if(colorkey)
 		{
-			ColorKeyFade(hdc);
+			ColorKeyFade(hdc,CSize(rc.Width(),rc.Height()));
 		}else{
 			BLENDFUNCTION bf;
 			bf.AlphaFormat =0;
@@ -294,7 +294,7 @@ void CGDISurface::SetFadeLevel(int level)
 		{
 			delete dst_bits;
 		}
-		dst_bits=(char *)NEW DWORD[size.cx *size.cy];
+		dst_bits=(char *)NEW DWORD[800 *600];
 	}
 }
 

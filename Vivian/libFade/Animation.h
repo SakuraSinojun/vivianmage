@@ -36,7 +36,7 @@ class CAnimation : public CGameWnd
 public:
 	enum{
 		ANIMATIONTYPE_IMAGE,
-		ANIMATIONTYPE_TRACE,
+		ANIMATIONTYPE_TRACK,
 	};
 
 	CAnimation(void);
@@ -64,11 +64,11 @@ public:
 	//Á´±í²Ù×÷½áÊø¡£
 
 
+protected:
+
 	void OnPaint(HDC hdc);
 	void prePaint(HDC hdc);
 
-
-protected:
 
 	void DrawImage();
 	void DrawTrack();
@@ -91,5 +91,8 @@ protected:
 
 	int image_delaycount;
 	int track_delaycount;
+
+	DWORD image_oTick;
+	DWORD track_oTick;
 
 };

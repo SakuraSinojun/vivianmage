@@ -195,22 +195,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\libFade\MainWnd.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\MainWnd.h"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\Monster.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libFade\Monster.h"
-				>
-			</File>
-			<File
 				RelativePath=".\libFade\preLoad.cpp"
 				>
 			</File>
@@ -283,6 +267,14 @@
 				</File>
 				<File
 					RelativePath=".\libFade\Animation.h"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Cursor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\libFade\Cursor.h"
 					>
 				</File>
 				<File

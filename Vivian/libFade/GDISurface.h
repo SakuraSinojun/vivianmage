@@ -17,7 +17,7 @@ public:
 	HRESULT Load(const char * name);
 	HRESULT SetColorKey(bool bColorKey);
 	
-	void CGDISurface::ColorKeyFade(HDC hdc);
+	void CGDISurface::ColorKeyFade(HDC hdc,CSize size);
 
 	void * Add();
 
@@ -33,7 +33,11 @@ public:
 	CPoint GetSrcPos()const;
 	void SetSrcRect(CRect& rect);
 	void Show(bool _show=true);
-	
+	CPoint GetDrawPos()
+	{
+		return this->draw_pos;
+	}
+
 	void SetFadeLevel(int level=255);
 
 

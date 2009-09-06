@@ -70,6 +70,11 @@ void CGameWnd::MoveWindow(int x,int y)
 	surface->SetDrawPos (x,y);
 }
 
+CPoint CGameWnd::GetWindowPos()
+{
+	return surface->GetDrawPos();
+}
+
 void CGameWnd::ShowWindow(bool show)
 {
 	surface->Show (show);

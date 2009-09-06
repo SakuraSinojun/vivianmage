@@ -25,6 +25,7 @@ public:
 	void BringWindowToTop();
 	
 	void MoveWindow(int x,int y);
+	CPoint GetWindowPos();
 	void UseBitmapRect(CRect& rect);
 
 	void SetColorKey(bool colorkey);

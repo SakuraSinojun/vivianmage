@@ -23,6 +23,7 @@ public:
 
 	virtual void SetDrawPos(int x,int y)=0;					//绘制目标位置
 	virtual void SetDrawPos(CPoint point)=0;				//绘制目标位置
+	virtual CPoint GetDrawPos()=0;							//取得绘制位置
 	virtual void SetSrcPos(int x,int y)=0;					//绘图来源位置
 	virtual void SetSrcRect(CRect& rect)=0;					//绘图来源区域
 	virtual void Show(bool _show=true)=0;					//显示绘图页

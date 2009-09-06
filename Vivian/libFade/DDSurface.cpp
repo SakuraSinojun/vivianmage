@@ -213,7 +213,7 @@ HRESULT CDDSurface::Draw(LPDIRECTDRAWSURFACE draw, DDSURFACEDESC &ddsd)
 	{
 		res=draw->Blt (&dst,surface,&src,DDBLT_WAIT | (colorkey?DDBLT_KEYSRC:0),&ddbltfx);
 	}else{
-		ColorKeyFade(draw,this->Get());
+		ColorKeyFade(draw,this->Get(),CSize(width,height));
 		res=DD_OK;
 	}
 	
@@ -230,8 +230,10 @@ HRESULT CDDSurface::Draw(LPDIRECTDRAWSURFACE draw, DDSURFACEDESC &ddsd)
 }
 
 
-void CDDSurface::ColorKeyFade(LPDIRECTDRAWSURFACE lps1, LPDIRECTDRAWSURFACE lps3)
+void CDDSurface::ColorKeyFade(LPDIRECTDRAWSURFACE lps1, LPDIRECTDRAWSURFACE lps3,CSize size)
 {
+
+	//这个函数可以改进成GetDC之后做Alpha运算。速度比直接读写显存要快。
 
 	CRect rc_dst(draw_pos,draw_size);
 	CRect rc_src;

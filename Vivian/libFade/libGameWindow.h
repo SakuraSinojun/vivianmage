@@ -8,5 +8,6 @@
 #include "MapWnd.h"
 #include "TextWnd.h"
 #include "Animation.h"
+#include "Cursor.h"
 
 

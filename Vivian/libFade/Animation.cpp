@@ -12,14 +12,16 @@ CAnimation::CAnimation(void):
 	image_delaycount(0),
 	track_delaycount(0),
 	bImageCircle(false),
-	bTrackCircle(false)
+	bTrackCircle(false),
+	image_oTick(0),
+	track_oTick(0)
 {
 }
 
 CAnimation::~CAnimation(void)
 {
 	this->RemoveAllFrames (this->ANIMATIONTYPE_IMAGE );
-	this->RemoveAllFrames (this->ANIMATIONTYPE_TRACE );
+	this->RemoveAllFrames (this->ANIMATIONTYPE_TRACK );
 }
 
 void CAnimation::Start(int _AnimationType)
@@ -44,7 +46,7 @@ void CAnimation::Start(int _AnimationType)
 		this->SetColorKey (image_current->colorkey);
 		this->SetFadeLevel (image_current->iFadeLevel);
 
-	}else if(_AnimationType==ANIMATIONTYPE_TRACE)
+	}else if(_AnimationType==ANIMATIONTYPE_TRACK)
 	{
 		bTrackRunning=true;
 		if(track_current==NULL)
@@ -60,10 +62,10 @@ void CAnimation::Pause(int _AnimationType)
 {
 	if(_AnimationType==ANIMATIONTYPE_IMAGE)
 	{
-		
-	}else if(_AnimationType==ANIMATIONTYPE_TRACE)
+		bImageRunning=false;
+	}else if(_AnimationType==ANIMATIONTYPE_TRACK)
 	{
-	
+		bTrackRunning=false;
 	}else
 	{
 	}
@@ -76,11 +78,22 @@ void CAnimation::Stop(int _AnimationType)
 		bImageRunning=false;
 		image_current =image_first;
 		image_delaycount=0;
-	}else if(_AnimationType==ANIMATIONTYPE_TRACE)
+		if(image_first!=NULL)
+		{
+			Load(image_first->filename);
+			SetColorKey(image_first->colorkey);
+			this->UseBitmapRect (image_first->rect);
+			SetFadeLevel(image_first->iFadeLevel);
+		}
+	}else if(_AnimationType==ANIMATIONTYPE_TRACK)
 	{
 		bTrackRunning=false;
 		track_current=track_first;
-		image_delaycount=0;
+		track_delaycount=0;
+		if(track_first!=NULL)
+		{
+			MoveWindow(track_first->x,track_first->y);
+		}
 	}else
 	{
 	}
@@ -91,7 +104,7 @@ bool CAnimation::IsRunning(int _AnimationType)
 	if(_AnimationType==ANIMATIONTYPE_IMAGE)
 	{
 		return bImageRunning ;
-	}else if(_AnimationType==ANIMATIONTYPE_TRACE)
+	}else if(_AnimationType==ANIMATIONTYPE_TRACK)
 	{
 		return bTrackRunning;
 	}else
@@ -120,6 +133,9 @@ int CAnimation::AddFrame(PIMAGEFRAME _frame)
 
 int CAnimation::AddFrame(PTRACKFRAME _frame)
 {
+	if(_frame->nDelay <=0)
+		return 0;
+
 	TRACKFRAME * frame=NEW TRACKFRAME(*_frame);
 	frame->next=NULL;
 	frame->prev=NULL;
@@ -132,8 +148,8 @@ int CAnimation::AddFrame(PTRACKFRAME _frame)
 		frame->prev=track_last;
 	}
 	track_last=frame;
-	//return GetFrameCount(ANIMATIONTYPE_TRACE);
-	return 0;
+	//return GetFrameCount(ANIMATIONTYPE_TRACK);
+	return 1;
 }
 
 int CAnimation::GetFrameCount(int _AnimationType)
@@ -143,7 +159,7 @@ int CAnimation::GetFrameCount(int _AnimationType)
 	if(_AnimationType==ANIMATIONTYPE_IMAGE)
 	{
 	
-	}else if(_AnimationType==ANIMATIONTYPE_TRACE)
+	}else if(_AnimationType==ANIMATIONTYPE_TRACK)
 	{
 	
 	}else
@@ -166,7 +182,9 @@ void CAnimation::RemoveAllFrames(int _AnimationType)
 			delete frame;
 			frame=_f;
 		}
-	}else if(_AnimationType==ANIMATIONTYPE_TRACE)
+		image_first=NULL;
+		image_last=NULL;
+	}else if(_AnimationType==ANIMATIONTYPE_TRACK)
 	{
 		TRACKFRAME * frame=track_first;
 		TRACKFRAME * _f=frame;
@@ -176,6 +194,8 @@ void CAnimation::RemoveAllFrames(int _AnimationType)
 			delete frame;
 			frame=_f;
 		}	
+		track_first=NULL;
+		track_last=NULL;
 	}else
 	{
 	}
@@ -187,7 +207,7 @@ void CAnimation::CircleAnimation(int _AnimationType,bool bCircle)
 	if(_AnimationType==ANIMATIONTYPE_IMAGE)
 	{
 		bImageCircle=bCircle;
-	}else if(_AnimationType==ANIMATIONTYPE_TRACE)
+	}else if(_AnimationType==ANIMATIONTYPE_TRACK)
 	{
 		bTrackCircle=bCircle;
 	}else
@@ -201,13 +221,13 @@ void CAnimation::OnPaint(HDC hdc)
 
 void CAnimation::DrawImage()
 {
-	static DWORD oTick=0;
 	DWORD t;
 	PIMAGEFRAME _imagenext;
 	
 	//没启动图片动画
 	if(!bImageRunning)
 	{
+		image_oTick=0;
 		return;
 	}
 
@@ -240,16 +260,16 @@ void CAnimation::DrawImage()
 	//不是最后一帧，或因循环而指向了第一帧。
 	//用Tick计算用去时间。
 	t=::GetTickCount ();
-	if(oTick==0)
+	if(image_oTick==0)
 	{
 		//第一次刷新。
-		oTick=t;
+		image_oTick=t;
 		return;
 	}
 	
 	//每次绘制前先计算当前已用掉时间。
-	image_delaycount +=(t-oTick);
-	oTick=t;
+	image_delaycount +=(t-image_oTick);
+	image_oTick=t;
 	
 	//到了跳到下一帧的时间。
 	if(image_delaycount>=_imagenext->nDelay)
@@ -266,13 +286,15 @@ void CAnimation::DrawImage()
 
 void CAnimation::DrawTrack()
 {
-	static DWORD oTick=0;
 	DWORD t;
 	PTRACKFRAME _tracknext;
-	
+	int x,y;
+
+
 	//没启动图片动画
 	if(!bTrackRunning)
 	{
+		track_oTick=0;
 		return;
 	}
 
@@ -305,21 +327,31 @@ void CAnimation::DrawTrack()
 	//不是最后一帧，或因循环而指向了第一帧。
 	//用Tick计算用去时间。
 	t=::GetTickCount ();
-	if(oTick==0)
+	if(track_oTick==0)
 	{
 		//第一次刷新。
-		oTick=t;
+		track_oTick=t;
 		return;
 	}
 	
 	//每次绘制前先计算当前已用掉时间。
-	track_delaycount +=(t-oTick);
-	oTick=t;
+	track_delaycount +=(t-track_oTick);
+	track_oTick=t;
 	
+	x=_tracknext->x-track_current->x;
+	y=_tracknext->y-track_current->y;
+	x=x*track_delaycount/_tracknext->nDelay;
+	y=y*track_delaycount/_tracknext->nDelay;
+
+	if(track_delaycount<_tracknext->nDelay)
+	{
+		this->MoveWindow (track_current->x+x,track_current->y+y);
+	}else{
+		MoveWindow(_tracknext->x,_tracknext->y);
+	}
 	//到了跳到下一帧的时间。
 	if(track_delaycount>=_tracknext->nDelay)
 	{
-		this->MoveWindow (_tracknext->x,_tracknext->y);
 		track_delaycount=track_delaycount-_tracknext->nDelay;
 		track_current=_tracknext;
 	}

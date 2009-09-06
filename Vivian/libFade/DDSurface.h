@@ -70,6 +70,12 @@ public:
 	CPoint GetSrcPos()const;
 	void SetSrcRect(CRect& rect);
 	void Show(bool _show=true);
+	
+	CPoint GetDrawPos()
+	{
+		return this->draw_pos;
+	}
+
 
 	COLORREF GetPTColor(){return ptcolor;}
 	LPDIRECTDRAWSURFACE Get(){return surface;}
@@ -79,7 +85,7 @@ public:
 	
 	void SetFadeLevel(int level=255);
 
-	void ColorKeyFade(LPDIRECTDRAWSURFACE lps1, LPDIRECTDRAWSURFACE lps3);
+	void ColorKeyFade(LPDIRECTDRAWSURFACE lps1, LPDIRECTDRAWSURFACE lps3,CSize size);
 	void SetPaintWnd(CPaintWnd * _paintwnd){painter=_paintwnd;}
 
 
