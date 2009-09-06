@@ -1,3 +1,23 @@
+
+
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	GDIDraw.cpp
+//	Author		:	SakuraSinojun
+//	Description	:	this is the class to use GDISurface.
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 #include "GDIDraw.h"
 
 CGDIDraw::CGDIDraw(void)

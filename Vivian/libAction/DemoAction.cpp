@@ -7,7 +7,7 @@ CDemoAction * pAction;
 CDemoAction::CDemoAction(void)
 {
 	pMainMenu=NEW CMainMenu();
-	pShop=NEW CShop();
+	//pShop=NEW CShop();
 	win1=NEW CMapWnd();
 	win2=NEW CTextWnd();
 	win3=NEW CAnimation();
@@ -20,7 +20,7 @@ CDemoAction::CDemoAction(void)
 CDemoAction::~CDemoAction(void)
 {
 	delete pMainMenu;
-	delete pShop;
+	//delete pShop;
 	delete win1;
 	delete win2;
 	delete win3;
@@ -32,9 +32,9 @@ void CDemoAction::OnCreate ()
 {
 	pKey=this;
 
-
 	win1->Create ("CGDATA\\bg.bmp","CGDATA\\bg1.bmp","CGDATA\\bg2.bmp","CGDATA\\bg3.bmp");
 	win1->SetSplitPoint (CPoint(320,240));
+	
 	
 	
 	win2->SetTextColor (RGB(255,0,0));
@@ -93,11 +93,14 @@ void CDemoAction::OnCreate ()
 	win4->CircleAnimation (win4->ANIMATIONTYPE_IMAGE ,true);
 
 
-	win5->Create ("CGDATA\\char.bmp");
+	win5->Load ("CGDATA\\char.bmp");
 	win5->SetColorKey (true);
 
 	win5->MoveWindow (128,0);
 	//win5->SetFadeLevel (128);
+	
+	
+	
 	pMainMenu->Create ();
 
 

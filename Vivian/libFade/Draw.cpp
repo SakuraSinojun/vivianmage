@@ -1,5 +1,19 @@
 
 
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	Draw.cpp
+//	Author		:	SakuraSinojun
+//	Description	:	Main interface of drawing.
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
 
 #include "Draw.h"
 
@@ -9,36 +23,46 @@
 
 #include "..\Memory.h"
 
+#include <string>
 
 namespace CDraw
 {
 	//启动参数
-	bool	_win;
-	bool	_idlemsg;
-	int		_winwidth;
-	int		_winheight;
-	bool	_showfps=true;
+	bool	_win;						//窗口化运行
+	bool	_idlemsg;					//响应idle
+	int		_winwidth;					//窗口宽
+	int		_winheight;					//窗口高
+	bool	_showfps=true;				//显示FPS
+	
+	WNDPROC	_windowprocedure=NULL;		//消息回调函数指针
 
-	WNDPROC	_windowprocedure=NULL;
+	
 
-	//空间变量
-	CDirectDraw DirectDraw;
-	CGDIDraw	GDIDraw;
-	HWND		m_hWnd=NULL;
-	HINSTANCE	m_hInstance;
-	char		FPS[100];
+#ifdef __USE_DIRECTDRAW__
+	CDirectDraw DirectDraw;				//DirectDraw绘图类
+#endif
+	CGDIDraw	GDIDraw;				//GDI绘图类
+	HWND		m_hWnd=NULL;			//主窗口句柄
+	HINSTANCE	m_hInstance;			//实例句柄
+	char		FPS[100];				//FPS消息
 
+
+#ifdef __USE_DIRECTDRAW__
+	//取得Direct绘图类
 	CDirectDraw& GetDirectDraw()
 	{
 		return DirectDraw;
 	}
-	
+#endif
+
+
+	//取得GDI绘图类
 	CGDIDraw&	GetGDIDraw()
 	{
 		return GDIDraw;
 	}
 
-	//回调函数	
+	//窗口过程回调函数	
 	LRESULT CALLBACK _WindowProcedure(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		switch(uMsg)
@@ -62,7 +86,7 @@ namespace CDraw
 	}
 	
 	
-
+	//计算FPS.
 	void CalcFPS()
 	{
 		static DWORD oTime=0;
@@ -84,6 +108,7 @@ namespace CDraw
 		}
 	}
 
+	//OnIdle循环。
 	BOOL OnIdle(LONG count)
 	{
 		CalcFPS();
@@ -101,6 +126,7 @@ namespace CDraw
 				ReleaseDC(m_hWnd,hdc);
 			}
 		}else{
+#ifdef __USE_DIRECTDRAW__
 			DirectDraw.Draw ();
 			if(_showfps)
 			{
@@ -109,12 +135,15 @@ namespace CDraw
 				DirectDraw.GetDrawable ()->ReleaseDC (hdc);
 			}
 			DirectDraw.Flip ();
+#endif
 		}
 		
 		::SetWindowText (m_hWnd,FPS);
 		return TRUE;
 	}
 
+
+	//建立窗口
 	void CreateGameWindow(HINSTANCE hInstance ,int width,int height,bool win,bool onidle)
 	{
 		WNDCLASSEX	wcex;
@@ -130,7 +159,7 @@ namespace CDraw
 		_winheight=height;
 		m_hInstance=hInstance;
 
-
+		//注册窗口类
 		wcex.cbClsExtra = 0;
 		wcex.cbSize = sizeof(WNDCLASSEX);
 		wcex.cbWndExtra = 0;
@@ -150,10 +179,11 @@ namespace CDraw
 			exit(0);
 		}
 		
+		//调整窗口大小
 		rect=CRect(0,0,width-4,height-4);
 		::AdjustWindowRect(&rect,WS_OVERLAPPEDWINDOW,FALSE);
 
-
+		//建立窗口
 		m_hWnd = CreateWindowEx(0, TEXT("VVWindow"), 
 									TEXT("VVRPG"), 
 									(_win)?(WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX):WS_POPUP,
@@ -165,9 +195,12 @@ namespace CDraw
 			exit(0);
 		}
 
+		//显示
 		ShowWindow(m_hWnd, SW_SHOW);
 
-		if(onidle)
+
+		//消息循环
+		if(onidle)			//响应idle
 		{
 			while(true)
 			{
@@ -192,7 +225,7 @@ namespace CDraw
 					::WaitMessage();
 				}
 			}
-		}else{
+		}else{			//不响应idle
 			while(GetMessage(&msgCur, NULL, 0, 0))  {
 				TranslateMessage(&msgCur);
 				DispatchMessage(&msgCur);
@@ -203,36 +236,47 @@ namespace CDraw
 	}
 
 	
+	//设定回调函数
 	void SetWindowProcedure(WNDPROC _proc)
 	{
 		_windowprocedure=_proc;
 	}
 
 
+	//附加到窗口
 	void Attach(HWND hWnd)
 	{
 		if(_win)
 		{
 			GDIDraw.Create (m_hWnd,_winwidth,_winheight);
 		}else{
+
+#ifdef __USE_DIRECTDRAW__
 			if(DirectDraw.Create (m_hWnd,_winwidth,_winheight,CDirectDraw::FullColor))
 			{
 			}else{
 				::MessageBox (m_hWnd,"DirectDraw初始化错误!","ERROR",MB_OK | MB_ICONINFORMATION);
 				exit(0);
 			}
+#endif
+
 		}
 	}
 
+
+	//建立绘图页，CSurface类不允许构建，所以调用此函数。此处应类似工厂模式。
 	CSurface * CreateNewSurface()
 	{
 		if(_win)
 		{
 			return NEW CGDISurface();
 		}else{
+#ifdef __USE_DIRECTDRAW__
 			return NEW CDDSurface();
+#endif
 		}
 	}
+
 
 };
 

@@ -43,10 +43,14 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	}else{
 		_win=false;
 	}
+
+#ifndef __USE_DIRECTDRAW__
+	_win=true;
+#endif
 	
 
 	CDraw::SetWindowProcedure (WindowProcedure);
-	CDraw::CreateGameWindow (hInstance,640,480,true);
+	CDraw::CreateGameWindow (hInstance,640,480,_win);
 
 	//::MessageBeep (-1);
 	

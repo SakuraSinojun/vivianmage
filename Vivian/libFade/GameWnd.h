@@ -1,4 +1,19 @@
 
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	GameWnd.h
+//	Author		:	SakuraSinojun
+//	Description	:	this class is used to create a graphic window in the Game
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
+
 
 #pragma once
 
@@ -13,7 +28,7 @@ public:
 	CGameWnd(void);
 	virtual ~CGameWnd(void);
 	
-	bool Create(const char * filename);
+	bool Create(int width,int height);
 	
 	bool Load(const char *filename);
 
@@ -33,13 +48,14 @@ public:
 	
 	CSize GetSize();
 
-	CLayer* GetLayer(){return layer;}
+	
 		
 
 protected:
 	virtual void prePaint(HDC hdc){};
 	virtual void OnPaint(HDC hdc){};
-
+	
+	CLayer* GetLayer(){return layer;}
 
 	CLayer * layer;
 	CSurface * surface;

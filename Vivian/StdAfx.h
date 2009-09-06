@@ -3,6 +3,14 @@
 #pragma once
 
 
+#ifdef __USE_DIRECTDRAW__
+#undef __USE_DIRECTDRAW__
+#endif
+
+
+//让下面这句注释生效以编译DirectDraw
+//#define __USE_DIRECTDRAW_
+
 
 #include "Memory.h"
 
@@ -12,21 +20,17 @@
 
 #include "typedef.h"
 
+#ifdef __USE_DIRECTDRAW__
 #include <ddraw.h>
 #pragma comment(lib,"ddraw.lib")
-
+#endif
 
 #pragma comment(lib,"winmm.lib")
-
 #pragma comment (lib,"MSIMG32.LIB")
 
 
-//#define new new(__FILE__,__LINE__)
 
-/*
-#include <D3D9.h>
-#pragma comment(lib,"d3d9.lib")
-*/
+
 
 
 

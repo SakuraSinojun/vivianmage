@@ -1,5 +1,6 @@
 
 
+#ifdef __USE_DIRECTDRAW__
 
 #include "..\stdafx.h"
 #include "DDSurface.h"
@@ -664,4 +665,6 @@ void * CDDSurface::Add()
 	return (*dd).Add (this);
 }
 
+
+#endif			//__USE_DIRECTDRAW__
 

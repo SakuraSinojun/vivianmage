@@ -1,5 +1,19 @@
 
 
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	TextWnd.h
+//	Author		:	SakuraSinojun
+//	Description	:	this class is used to draw text on the surface
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
 
 #pragma once
 #include "gamewnd.h"

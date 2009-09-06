@@ -11,6 +11,10 @@
 
 //#include <list>
 
+
+
+#ifdef __USE_DIRECTDRAW__
+
 #include "ddraw.h"
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"ddraw.lib")
@@ -57,3 +61,8 @@ protected:
 
 
 #endif
+
+#endif
+
+
+

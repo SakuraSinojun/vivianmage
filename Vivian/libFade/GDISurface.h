@@ -1,3 +1,21 @@
+
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	GDISurface.h
+//	Author		:	SakuraSinojun
+//	Description	:	this is the cavans on which we draw use GDI.
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
+
+
+
 #pragma once
 
 #include "..\stdafx.h"

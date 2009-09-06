@@ -4,6 +4,8 @@
 
 #include "..\stdafx.h"
 
+
+//继承自CPaintWnd的类，在SetPaintWnd(this)之后可在每一帧绘制的前后对绘图页做出调整。
 class CPaintWnd
 {
 public:
@@ -12,6 +14,8 @@ public:
 };
 
 
+//CSurface 是一个抽象类，继承自它的CGDISurface和CDDSurface用于建立绘图页
+//当绘制每一帧时，所有绘图页的内容将被绘制到屏幕缓冲区中，Flip翻页时，绘冲区中的内容将被绘制到屏幕上。
 class CSurface
 {
 public:

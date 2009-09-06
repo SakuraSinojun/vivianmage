@@ -1,3 +1,21 @@
+
+
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	Animation.cpp
+//	Author		:	SakuraSinojun
+//	Description	:	this class is used to create an animation based on frame.
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
+
+
 #include "Animation.h"
 
 CAnimation::CAnimation(void):
@@ -24,6 +42,8 @@ CAnimation::~CAnimation(void)
 	this->RemoveAllFrames (this->ANIMATIONTYPE_TRACK );
 }
 
+
+//开始动画。参数可选为：0--跳帧动画，1--轨迹动画
 void CAnimation::Start(int _AnimationType)
 {
 	if(surface==NULL)
@@ -58,6 +78,7 @@ void CAnimation::Start(int _AnimationType)
 	}
 }
 
+//暂停动画。参数可选为：0--跳帧动画，1--轨迹动画
 void CAnimation::Pause(int _AnimationType)
 {
 	if(_AnimationType==ANIMATIONTYPE_IMAGE)
@@ -71,6 +92,7 @@ void CAnimation::Pause(int _AnimationType)
 	}
 }
 
+//停止动画并返回初始状态。参数可选为：0--跳帧动画，1--轨迹动画
 void CAnimation::Stop(int _AnimationType)
 {
 	if(_AnimationType==ANIMATIONTYPE_IMAGE)
@@ -99,6 +121,7 @@ void CAnimation::Stop(int _AnimationType)
 	}
 }
 
+//动画运行状态。参数可选为：0--跳帧动画，1--轨迹动画
 bool CAnimation::IsRunning(int _AnimationType)
 {
 	if(_AnimationType==ANIMATIONTYPE_IMAGE)
@@ -113,6 +136,7 @@ bool CAnimation::IsRunning(int _AnimationType)
 	}
 }
 
+//增加跳帧动画帧
 int CAnimation::AddFrame(PIMAGEFRAME _frame)
 {
 	IMAGEFRAME * frame=NEW IMAGEFRAME(*_frame);
@@ -131,6 +155,7 @@ int CAnimation::AddFrame(PIMAGEFRAME _frame)
 	return 0;
 }
 
+//增加轨迹动画帧
 int CAnimation::AddFrame(PTRACKFRAME _frame)
 {
 	if(_frame->nDelay <=0)
@@ -152,6 +177,7 @@ int CAnimation::AddFrame(PTRACKFRAME _frame)
 	return 1;
 }
 
+//没用到这个函数。调用则一定会返回0值。
 int CAnimation::GetFrameCount(int _AnimationType)
 {
 	int count=0;
@@ -169,6 +195,7 @@ int CAnimation::GetFrameCount(int _AnimationType)
 
 }
 
+//移除所有帧。参数可选为：0--跳帧动画，1--轨迹动画
 void CAnimation::RemoveAllFrames(int _AnimationType)
 {
 
@@ -201,6 +228,7 @@ void CAnimation::RemoveAllFrames(int _AnimationType)
 	}
 }
 
+//设定动画循环。参数可选为：0--跳帧动画，1--轨迹动画
 void CAnimation::CircleAnimation(int _AnimationType,bool bCircle)
 {
 	
@@ -219,6 +247,7 @@ void CAnimation::OnPaint(HDC hdc)
 {
 }
 
+//绘制Image动画
 void CAnimation::DrawImage()
 {
 	DWORD t;
@@ -284,6 +313,7 @@ void CAnimation::DrawImage()
 
 }
 
+//绘制Track动画。
 void CAnimation::DrawTrack()
 {
 	DWORD t;
@@ -359,6 +389,7 @@ void CAnimation::DrawTrack()
 
 }
 
+//预渲染
 void CAnimation::prePaint(HDC hdc)
 {
 	DrawImage();

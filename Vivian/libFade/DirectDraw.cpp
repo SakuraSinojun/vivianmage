@@ -1,5 +1,8 @@
 
 
+
+#ifdef __USE_DIRECTDRAW__
+
 #include "..\stdafx.h"
 
 #include "DirectDraw.h"
@@ -246,7 +249,7 @@ HRESULT CDirectDraw::Flip ()
 
 
 
-
+#endif
 
 
 

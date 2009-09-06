@@ -6,7 +6,7 @@
 //	Description	:	this is the cavans on which we draw use GDI.
 //	
 //	Version		:	1.0.0.1
-//	Date		:	2009.9.3
+//	Date		:	2009.9.6
 //
 //	Copyright(c):	 2009-2010 Sakura
 //
@@ -58,6 +58,7 @@ CGDISurface::~CGDISurface(void)
 
 }
 
+//不加载位图而直接建立绘图页。
 HRESULT CGDISurface::Create(int width,int height)
 {
 	if(m_hbitmap!=NULL)
@@ -66,21 +67,23 @@ HRESULT CGDISurface::Create(int width,int height)
 		m_hbitmap=NULL;
 	}
 
-	//bmp_bits
 
-	HDC hdc=::GetDC(NULL);
-	UINT iPlanes=GetDeviceCaps(hdc,PLANES);
-	UINT iBitsPixel=GetDeviceCaps(hdc,BITSPIXEL);
+	HDC hdc=::GetDC(NULL);								//取得屏幕DC
+	UINT iPlanes=GetDeviceCaps(hdc,PLANES);				//调色盘
+	UINT iBitsPixel=GetDeviceCaps(hdc,BITSPIXEL);		//比特每像素
 	
 	
+	//分配图像内存空间
 	if(bmp_bits==NULL)
 	{
 		bmp_bits=NEW char[width * height *iBitsPixel+1];
 	}
 	memset(bmp_bits,0,width*height*iBitsPixel+1);
 
+	//建立位图
 	m_hbitmap=::CreateBitmap(width,height,iPlanes,iBitsPixel,bmp_bits);
 
+	//按建立的位图填充bitmap结构
 	bitmap.bmBits =bmp_bits;
 	bitmap.bmBitsPixel =iBitsPixel;
 	bitmap.bmHeight =height;
@@ -88,8 +91,6 @@ HRESULT CGDISurface::Create(int width,int height)
 	bitmap.bmPlanes =iPlanes;
 	bitmap.bmWidthBytes =width * iBitsPixel;
 	bitmap.bmType =0;
-
-	//m_hbitmap=::CreateCompatibleBitmap (hdc,width,height);
 
 	if(m_hbitmap)
 	{
@@ -99,7 +100,6 @@ HRESULT CGDISurface::Create(int width,int height)
 	ReleaseDC(NULL,hdc);
 
 	
-	
 	size.cx=width;
 	size.cy=height;
 	draw_size=size;
@@ -108,6 +108,8 @@ HRESULT CGDISurface::Create(int width,int height)
 
 }
 
+
+//同时设定了ColorKey和Fade两种渲染效果的渲染函数
 void CGDISurface::ColorKeyFade(HDC hdc,CSize size)
 {
 	if(dst_bits==NULL)
@@ -157,7 +159,6 @@ void CGDISurface::ColorKeyFade(HDC hdc,CSize size)
 	int i;
 	int j;
 	int od,os;
-
 
 	char *src_bits=(char *)bitmap.bmBits ;
 
@@ -211,19 +212,22 @@ void CGDISurface::ColorKeyFade(HDC hdc,CSize size)
 
 }
 
+//设定绘图回调类。
 void CGDISurface::SetPaintWnd(CPaintWnd * _paintwnd)
 {
 	painter=_paintwnd;
 }
 
+//渲染当前绘图面
 HRESULT CGDISurface::Draw(HDC hdc,HWND hWnd)
 {
+	//预绘制
 	if(painter!=NULL)
 	{
 		painter->prePaint (hdc);
 	}
 
-
+	//当前页显示与否
 	if(!show)
 		return 0;
 
@@ -272,6 +276,8 @@ HRESULT CGDISurface::Draw(HDC hdc,HWND hWnd)
 		}
 	}
 	
+
+	//绘图结束，OnPaint后续处理
 	if(painter!=NULL)
 	{
 		painter->OnPaint (hdc);
@@ -281,6 +287,7 @@ HRESULT CGDISurface::Draw(HDC hdc,HWND hWnd)
 
 }
 
+//设定透明度，0~255。0和255为不透明。
 void CGDISurface::SetFadeLevel(int level)
 {
 	iFadeLevel=level;
@@ -298,7 +305,7 @@ void CGDISurface::SetFadeLevel(int level)
 	}
 }
 
-
+//加载位图到绘图页。
 HRESULT CGDISurface::Load(const char * name)
 {
 
@@ -327,7 +334,7 @@ HRESULT CGDISurface::Load(const char * name)
 
 }
 
-
+//设置透明色。
 HRESULT CGDISurface::SetColorKey(bool bColorKey)
 {
 
@@ -337,11 +344,10 @@ HRESULT CGDISurface::SetColorKey(bool bColorKey)
 
 }
 
+//将绘图页添加至绘图列表中。
 void * CGDISurface::Add()
 {
-
-	return CDraw::GetGDIDraw().Add (this);
-	
+	return CDraw::GetGDIDraw().Add (this);	
 }
 
 

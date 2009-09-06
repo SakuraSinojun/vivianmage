@@ -25,7 +25,7 @@
 			UseOfATL="0"
 			CharacterSet="2"
 			ManagedExtensions="0"
-			WholeProgramOptimization="4"
+			WholeProgramOptimization="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"

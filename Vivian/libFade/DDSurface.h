@@ -15,6 +15,10 @@
 
 #pragma once
 
+
+#ifdef __USE_DIRECTDRAW__
+
+
 #ifndef __DDSerface_h__
 #define __DDSerface_h__
 
@@ -271,6 +275,6 @@ inline void CDDSurface::SetSrcRect (CRect& rect)
 
 
 
-
+#endif		//__USE_DIRECTDRAW__
 
 

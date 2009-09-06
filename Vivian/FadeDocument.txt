@@ -2,7 +2,7 @@
 ---------------------log-----------------------
 
 09/08/30	CMainWnd类和CLayer类基本结构的确定。
-
+09/09/06	图形引擎基本成型。
 
 -----------------------------------------------
 
@@ -11,9 +11,75 @@
 
 接口说明：
 
-背景、角色、怪物、遮盖物、文本、动画将在不同的Layer绘制，最终显示的结果是各Layer的整合。
+[09/09/07]
+1.头文件
+	使用时需要包含"libFade.h"文件，这个文件位于"libFade"文件夹内。
 
-角色、遮盖物、怪物三者将按调用顺序绘制，即当任两者重合时，先绘制的物件将被遮盖。因此在显示它们时应注意绘制顺序。
-
-
-
+2.导出类
+	将导出CGameWnd、CMapWnd、CTextWnd、CCursor、CAnimation五个类。
+	
+3.CGameWnd类说明
+	CGameWnd类是所有游戏窗口类的基类，这个类完成了添加与操作游戏中窗口的功能。
+	使用CGameWnd类可以建立以某张位图为背景的窗口，或涂满黑色的窗口。若想使用其它颜色或在当前页绘制图形，请继承CGameWnd类并重写其OnPaint()函数。
+	成员函数说明：
+	
+	bool Create(int width,int height);			创建一个黑色前景的窗口
+	bool Load(const char *filename);			加载一张位图到当前窗口
+	void ShowWindow(bool show);					显示窗口
+	void MoveForward();							将窗口上移一层
+	void MoveBehind();							将窗口后移一层
+	void SetWindowOn(CGameWnd * _window);		将窗口置于另一窗口上方
+	void BringWindowToTop();					将窗口带到最前端
+	void MoveWindow(int x,int y);				移动窗口位置
+	CPoint GetWindowPos();						取得窗口位置
+	void UseBitmapRect(CRect& rect);			裁切窗口。使用这个函数来确定窗口大小与绘制起始点，这个起始点将被置于点GetWindowPos()处。
+	void SetColorKey(bool colorkey);			设定透明色以创建不规则窗口。以当前画布(0,0)点处的像素为透明色。
+	void SetFadeLevel(int level=255);			设定Alpha融合等级以绘制半透明窗口。参数取值范围为0~255，level=0或255时窗口不透明。
+	CSize GetSize();							返回窗口大小
+	
+3.CMapWnd类说明
+	CMapWnd类用于加载四张位图以创建一个拼合地图。
+	这个类还需修改以实现GameWnd的常规功能。
+	目前已有成员如下：
+	
+	void Create(const char * file1,const char * file2,const char * file3,const char * file4);
+	void ShowWindow(bool show);
+	void SetMap(int index,const char * filename);		//index从0~3编号为左上、右上、左下、右下。
+	void SetSplitPoint(CPoint point);
+	CPoint GetSplitPoint();
+	
+4.CTextWnd类说明
+	默认colorkey为true。
+	将待扩展以可以设定所使用字体。
+	目前以下列成员创建文本属性，具体功能及参数参考MSDN中同名函数：
+	void SetBkColor(COLORREF color){_bkcolor=color;}
+	void SetTextColor(COLORREF color){_textcolor=color;}
+	void SetBkMode(int mode){_bkmode=mode;}
+	然后，以以下成员绘制文本：
+	void CreateText(int x,int y,const char * text);
+	每个文本类只能绘制一段文字。
+	
+5.CAnimation类说明
+	CAnimation类可创建两种动画类型：IMAGE和TRACK。命名为跳帧动画与轨迹动画。
+	跳帧动画：
+		调用AddFrame(PIMAGEFRAME)以添加跳帧动画，每一帧动画在屏幕上的停留时间为后一帧中定义的延迟时间nDelay。时间到达后，将切换显示下一帧。
+	轨迹动画
+		调用AddFrame(PTRACKFRAME)以添加轨迹动画，每次绘图时将计算已经用掉的时间以得到当前窗口应处的位置，以此以实现连续移动。当用掉的时间到
+		达下一动画帧中定义的延迟时间时，窗口移动到下一动画帧所处的位置并且动画跳到下一帧。
+	
+	动画结束最后一帧后，将判断是否循环播放。循环播放由函数CircleAnimation()指定，其中第一个参数为动画类型，取值为0(ANIMATIONTYPE_IMAGE)或
+	1(ANIMATIONTYPE_TRACK)。若不循环播放，则动画结束并设定结束标记。这个标记可以通过IsRunning()取得。
+	
+	tip:Stop()函数可以让动画复位。在开始新的动画前不妨调用一次Stop()以校正起始点。
+	
+6.CCursor类说明
+	CCursor类继承自CAnimation类，并简单地添加了一个函数MoveTo()以简化轨迹动画操作。
+	MoveTo(x,y,time)函数将以当前点为起始点，(x,y)点为目标点创建一个time秒内非循环轨迹动画。
+		
+	
+	
+	
+	
+	
+	
+	

@@ -1,5 +1,20 @@
 
 
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	Animation.h
+//	Author		:	SakuraSinojun
+//	Description	:	this class is used to create an animation based on frame.
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
+
 #pragma once
 #include "gamewnd.h"
 
@@ -17,14 +32,15 @@ public:
 	IMAGEFRAME* prev;				//must be NULL
 
 };
+
 class TRACKFRAME
 {
 public:
-	int x;
-	int y;
-	int nDelay;
-	TRACKFRAME* next;
-	TRACKFRAME* prev;
+	int x;							//Î»ÖÃx
+	int y;							//Î»ÖÃy
+	int nDelay;						//Ö¡Ê±¼ä£¨ºÁÃë£©
+	TRACKFRAME* next;				//must be NULL
+	TRACKFRAME* prev;				//must be NULL
 };
 
 typedef IMAGEFRAME *PIMAGEFRAME;
@@ -76,10 +92,10 @@ protected:
 
 	//int fps;
 	
-	bool bImageRunning;
-	bool bTrackRunning;
-	bool bImageCircle;
-	bool bTrackCircle;
+	bool bImageRunning;						//ÌøÖ¡¶¯»­ÔËÐÐ×´Ì¬
+	bool bTrackRunning;						//¹ì¼£¶¯»­ÔËÐÐ×´Ì¬
+	bool bImageCircle;						//ÌøÖ¡¶¯»­Ñ­»·×´Ì¬
+	bool bTrackCircle;						//¹ì¼£¶¯»­Ñ­»·×´Ì¬
 
 	IMAGEFRAME * image_first;
 	IMAGEFRAME * image_last;

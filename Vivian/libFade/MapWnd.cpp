@@ -1,3 +1,19 @@
+
+//////////////////////////////////////////////////////////////////
+//
+//	FileName	:	MapWnd.cpp
+//	Author		:	SakuraSinojun
+//	Description	:	this class is used to draw a joint map spliced by 4 pictures
+//	
+//	Version		:	1.0.0.1
+//	Date		:	2009.9.6
+//
+//	Copyright(c):	 2009-2010 Sakura
+//
+//////////////////////////////////////////////////////////////////
+
+
+
 #include "MapWnd.h"
 
 CMapWnd::CMapWnd(void):
@@ -23,8 +39,11 @@ void CMapWnd::Create(const char * file0,const char * file1,const char * file2,co
 
 	SetSplitPoint(CPoint(0,0));
 
+	ShowWindow(true);
+
 }
 
+//显示地图
 void  CMapWnd::ShowWindow(bool show)
 {
 	for(int i=0;i<4;i++)
@@ -32,15 +51,16 @@ void  CMapWnd::ShowWindow(bool show)
 
 }
 
+//设定地图CG，编号为0~3
 void CMapWnd::SetMap(int index,const char * filename)
 {
-	if(index>3)
+	if(index>3 || index<0)
 		return;
-	map[index].Create(filename);
+	map[index].Load(filename);
 
 }
 
-
+//设置分隔点。四张图片将以此点为依据来按排。
 void CMapWnd:: SetSplitPoint(CPoint point)
 {
 	this->point=point;
@@ -52,6 +72,7 @@ void CMapWnd:: SetSplitPoint(CPoint point)
 
 }
 
+//取得分隔点
 CPoint CMapWnd:: GetSplitPoint()
 {
 	return point;
