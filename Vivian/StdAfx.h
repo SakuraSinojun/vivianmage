@@ -4,7 +4,7 @@
 
 
 #ifdef __USE_DIRECTDRAW__
-#undef __USE_DIRECTDRAW__
+//#undef __USE_DIRECTDRAW__
 #endif
 
 
